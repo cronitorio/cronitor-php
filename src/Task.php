@@ -10,13 +10,24 @@ class Task {
 		$this->client = new Client($monitorId, $authKey);
 	}
 
-	public function monitor($task, $pause = false){
+	public function monitor($task, $exceptionHandler = false){
 		try{
+
 			$this->client->run();
-			$task();
+			$task($this->client);
 			$this->client->complete();
-		} catch (Exception $e){
-			$this->client->fail($e->getMessage());
+
+		} catch (Exception $exception){
+
+			$pause = false;
+
+			if(!$exceptionHandler){
+				$msg = $exception->getMessage();
+			} else {
+				extract( call_user_func($exceptionHandler, $exception, $this->client) );
+			}
+
+			$this->client->fail($msg);
 			if($pause){
 				$this->client->pause();
 			}
