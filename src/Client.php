@@ -46,8 +46,11 @@ class Client {
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => $this->buildUrl($endpoint, $parameters),
 			CURLOPT_TIMEOUT => 10,
+			CURLOPT_RETURNTRANSFER => true,
 		));
-		return curl_exec($curl);
+		$output = curl_exec($curl);
+		curl_close($curl);
+		return $output;
 	}
 
 	protected function buildUrl($endpoint, $parameters){
