@@ -12,9 +12,9 @@
     "psr-4": {
       "Cronitor\\": "src/"
     },
-    "files": {
+    "files": [
       "src/monitor.php"
-    }
+    ]
   },
   "require": {}
 }
