@@ -33,8 +33,8 @@ class Client {
 		return $this->ping('fail', ['msg' => $msg]);
 	}
 
-	public function pause(){
-		return $this->ping('pause');
+	public function pause($duration){
+		return $this->ping('pause/' . (int) $duration);
 	}
 
 	public function complete(){

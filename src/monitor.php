@@ -17,15 +17,16 @@ function cronitorMonitorTask($client, $closure, $exceptionHandler = false) {
 			// $exceptionHandler should return an array like the following:
 			// array(
 			//     'msg'   => (string) 'Some string that will act as an error message',
-			//     'pause' => (bool) This determines if this particular monitor
-			//                is paused in Cronitor. This is an optional value.
+			//     'pause' => (int) The number of hours to pause this monitor for
 			// )
             extract( $exceptionHandler($e, $client) );
         }
 
-        $client->fail($msg);
+		$client->fail($msg);
+
         if($pause){
-            $client->pause();
-        }
+            $client->pause((int) $pause);
+		}
+
     }
 }
