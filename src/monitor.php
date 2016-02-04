@@ -19,7 +19,7 @@ function cronitorMonitorTask($client, $closure, $exceptionHandler = false) {
 			//     'msg'   => (string) 'Some string that will act as an error message',
 			//     'pause' => (int) The number of hours to pause this monitor for
 			// )
-			$handled = $exceptionHandler($e, $client)
+			$handled = $exceptionHandler($e, $client);
             extract($handled);
         }
 
