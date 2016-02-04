@@ -7,7 +7,6 @@ class Client {
 	protected $monitorId;
 	protected $authKey;
 	protected $baseURI = 'https://cronitor.link';
-	protected $endpoints = ['run', 'fail', 'pause', 'complete'];
 
 	public function __construct($monitorId, $authKey = false){
 		$this->monitorId = $monitorId;
@@ -30,8 +29,8 @@ class Client {
 		return $this->ping('run');
 	}
 
-	public function fail(){
-		return $this->ping('fail');
+	public function fail($msg){
+		return $this->ping('fail', ['msg' => $msg]);
 	}
 
 	public function pause(){
@@ -42,13 +41,19 @@ class Client {
 		return $this->ping('complete');
 	}
 
-	protected function ping($endpoint){
+	protected function ping($endpoint, $parameters = []){
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
-			CURLOPT_URL => "{$this->baseURI}/{$this->monitorId}/{$endpoint}",
+			CURLOPT_URL => $this->buildUrl($endpoint, $parameters),
 			CURLOPT_TIMEOUT => 10,
 		));
 		return curl_exec($curl);
 	}
 
+	protected function buildUrl($endpoint, $parameters){
+		$url = "{$this->baseURI}/{$this->monitorId}/{$endpoint}";
+		$queryString = http_build_query($parameters);
+		$url .= (empty($queryString)) ? '' : "?{$queryString}";
+		return $url;
+	}
 }
