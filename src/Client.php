@@ -32,35 +32,37 @@ class Client
 
     public function run()
     {
-        return $this->ping('run');
+        return $this->request('run');
     }
 
     public function fail($msg)
     {
-        return $this->ping('fail', ['msg' => $msg]);
+        return $this->request('fail', ['msg' => $msg]);
     }
 
     public function pause($duration)
     {
-        return $this->ping('pause/' . (int) $duration);
+        return $this->request('pause/' . (int) $duration);
     }
 
     public function complete()
     {
-        return $this->ping('complete');
+        return $this->request('complete');
     }
 
-    protected function ping($endpoint, $parameters = [])
+    public function request($endpoint, $parameters = [])
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => $this->buildUrl($endpoint, $parameters),
             CURLOPT_TIMEOUT => 10,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => true,
         ));
-        $output = curl_exec($curl);
+        $response = curl_exec($curl);
+        $response = new Response($curl, $response);
         curl_close($curl);
-        return $output;
+        return $response;
     }
 
     protected function buildUrl($endpoint, $parameters)
