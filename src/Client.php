@@ -68,7 +68,7 @@ class Client
     protected function buildUrl($endpoint, $parameters)
     {
         $url = sprintf(
-            "%s/%s/%s",
+            '%s/%s/%s',
             $this->baseURI,
             $this->monitorId,
             $endpoint
