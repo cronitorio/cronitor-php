@@ -2,7 +2,8 @@
 
 namespace Cronitor;
 
-class Response {
+class Response
+{
 
     protected $curl;
     protected $response;
@@ -20,9 +21,8 @@ class Response {
         $this->parseResponse();
     }
 
-	protected function parseResponse()
-	{
-
+    protected function parseResponse()
+    {
         $this->http_code = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         $this->last_url = curl_getinfo($this->curl, CURLINFO_EFFECTIVE_URL);
         $this->error = curl_error($this->curl);
@@ -37,18 +37,17 @@ class Response {
         return $this;
     }
 
-	protected function parseHeaders($headersString)
-	{
+    protected function parseHeaders($headersString)
+    {
         $headers = array();
         $headersArray = explode("\n", $headersString);
         array_shift($headersArray);
-        foreach($headersArray as $header){
+        foreach ($headersArray as $header) {
             $parts = explode(':', $header);
-            if(isset($parts[1])){
+            if (isset($parts[1])) {
                 $headers[$parts[0]] = $parts[1];
             }
         }
         return $headers;
     }
-
 }
