@@ -8,7 +8,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 {
 
     public $client;
-	protected $okResponse;
+    protected $okResponse;
 
     public function setUp()
     {
