@@ -8,6 +8,12 @@
       "email": "nathaniel@fightthecurrent.org"
     }
   ],
+  "require": {
+    "php": ">=5.4.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.6"
+  },
   "autoload": {
     "psr-4": {
       "Cronitor\\": "src/"
@@ -16,5 +22,9 @@
       "src/monitor.php"
     ]
   },
-  "require": {}
+  "autoload-dev": {
+    "psr-4": {
+      "Cronitor\\Tests\\": "tests/"
+    }
+  }
 }
