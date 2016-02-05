@@ -67,9 +67,14 @@ class Client
 
     protected function buildUrl($endpoint, $parameters)
     {
-        $url = "{$this->baseURI}/{$this->monitorId}/{$endpoint}";
+		$url = sprintf(
+			"%s/%s/%s",
+			$this->baseURI,
+			$this->monitorId,
+			$endpoint
+		);
         $queryString = http_build_query($parameters);
-        $url .= (empty($queryString)) ? '' : "?{$queryString}";
+        $url .= (empty($queryString)) ? '' : '?' . $queryString;
         return $url;
     }
 }
