@@ -68,7 +68,7 @@ class Client
         return $response;
     }
 
-    protected function buildUrl($endpoint, $parameters)
+    public function buildUrl($endpoint, $parameters = [])
     {
         $url = sprintf(
             '%s/%s/%s',
