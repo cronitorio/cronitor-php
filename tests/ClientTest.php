@@ -12,15 +12,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     protected $okResponse;
 
     public function setUp()
-	{
-
-		$okHeaders = "HTTP/1.1 200 OK
+    {
+        $okHeaders = "HTTP/1.1 200 OK
 Server: nginx/1.4.6 (Ubuntu)
 Date: Mon, 08 Feb 2016 22:42:43 GMT
 Content-Length: 0
 Connection: close";
 
-		$this->okResponse = new cURL\Response('', $okHeaders);
+        $this->okResponse = new cURL\Response('', $okHeaders);
     }
 
     public function test_it_should_run()
@@ -55,22 +54,21 @@ Connection: close";
         $this->assertEquals($response->statusCode, 200);
     }
 
-	public function test_it_should_build_url()
-	{
-		$client = new Client('boogers');
-		$this->assertEquals('https://cronitor.link/boogers/run', $client->buildUrl('run'));
-	}
+    public function test_it_should_build_url()
+    {
+        $client = new Client('boogers');
+        $this->assertEquals('https://cronitor.link/boogers/run', $client->buildUrl('run'));
+    }
 
-	public function test_it_should_build_url_with_auth_key()
-	{
-		$client = new Client('boogers', '123abc');
-		$this->assertEquals('https://cronitor.link/boogers/run?auth_key=123abc', $client->buildUrl('run'));
-	}
+    public function test_it_should_build_url_with_auth_key()
+    {
+        $client = new Client('boogers', '123abc');
+        $this->assertEquals('https://cronitor.link/boogers/run?auth_key=123abc', $client->buildUrl('run'));
+    }
 
     protected function getOkClient()
     {
-
-		$okCurl = $this->getOkCurl();
+        $okCurl = $this->getOkCurl();
 
         $client = $this->getMockBuilder('\Cronitor\Client')
             ->setConstructorArgs(array('boogers'))
@@ -79,22 +77,21 @@ Connection: close";
 
         $client->expects($this->once())
             ->method('getcUrl')
-			->will($this->returnValue($okCurl));
+            ->will($this->returnValue($okCurl));
 
         return $client;
-	}
+    }
 
-	protected function getOkcUrl()
-	{
-
-		$curl = $this->getMockBuilder('\anlutro\cURL\cURL')
+    protected function getOkcUrl()
+    {
+        $curl = $this->getMockBuilder('\anlutro\cURL\cURL')
             ->setMethods(array('sendRequest'))
             ->getMock();
 
         $curl->expects($this->once())
             ->method('sendRequest')
-			->will($this->returnValue($this->okResponse));
+            ->will($this->returnValue($this->okResponse));
 
-		return $curl;
-	}
+        return $curl;
+    }
 }

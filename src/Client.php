@@ -30,10 +30,10 @@ class Client
         $this->baseURI = $baseURI;
     }
 
-	protected function getcUrl()
-	{
-		return new anlutro\cURL\cURL;
-	}
+    protected function getcUrl()
+    {
+        return new anlutro\cURL\cURL;
+    }
 
     public function run()
     {
@@ -56,14 +56,13 @@ class Client
     }
 
     public function request($endpoint, $parameters = [])
-	{
+    {
+        $curl = $this->getcUrl();
 
-		$curl = $this->getcUrl();
+        $request = $curl->newRequest('get', $this->buildUrl($endpoint, $parameters))
+            ->setOption(CURLOPT_TIMEOUT, 10);
 
-		$request = $curl->newRequest('get', $this->buildUrl($endpoint, $parameters))
-			->setOption(CURLOPT_TIMEOUT, 10);
-
-		$response = $request->send();
+        $response = $request->send();
 
         return $response;
     }
@@ -75,11 +74,11 @@ class Client
             $this->baseURI,
             $this->monitorId,
             $endpoint
-		);
+        );
 
-		if($this->authKey){
-			$parameters['auth_key'] = $this->authKey;
-		}
+        if ($this->authKey) {
+            $parameters['auth_key'] = $this->authKey;
+        }
 
         $queryString = http_build_query($parameters);
         $url .= (empty($queryString)) ? '' : '?' . $queryString;
