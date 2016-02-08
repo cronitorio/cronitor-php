@@ -13,11 +13,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $okHeaders = "HTTP/1.1 200 OK
+        $okHeaders = 'HTTP/1.1 200 OK
 Server: nginx/1.4.6 (Ubuntu)
 Date: Mon, 08 Feb 2016 22:42:43 GMT
 Content-Length: 0
-Connection: close";
+Connection: close';
 
         $this->okResponse = new cURL\Response('', $okHeaders);
     }

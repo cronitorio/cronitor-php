@@ -9,7 +9,7 @@ class Client
     protected $authKey;
     protected $baseURI = 'https://cronitor.link';
 
-    public function __construct($monitorId, $authKey = false)
+    public function __construct($monitorId, $authKey = '')
     {
         $this->monitorId = $monitorId;
         $this->authKey = $authKey;
