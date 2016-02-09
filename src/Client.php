@@ -32,7 +32,7 @@ class Client
 
     protected function getcUrl()
     {
-        return new anlutro\cURL\cURL;
+        return new \anlutro\cURL\cURL;
     }
 
     public function run()
