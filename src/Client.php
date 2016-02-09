@@ -30,7 +30,7 @@ class Client
         $this->baseURI = $baseURI;
     }
 
-    protected function getcUrl()
+    public function getcUrl()
     {
         return new \anlutro\cURL\cURL;
     }

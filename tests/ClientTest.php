@@ -66,6 +66,11 @@ Connection: close';
         $this->assertEquals('https://cronitor.link/boogers/run?auth_key=123abc', $client->buildUrl('run'));
     }
 
+	public function test_it_should_get_curl(){
+        $client = new Client('boogers');
+		$this->assertEquals(new cUrl\cUrl, $client->getcUrl());
+	}
+
     protected function getOkClient()
     {
         $okCurl = $this->getOkCurl();
