@@ -4,7 +4,7 @@ function cronitorMonitorTask($client, $closure, $exceptionHandler = false)
 {
     try {
         $client->run();
-        $closure();
+        $returns = $closure();
         $client->complete();
     } catch (Exception $e) {
         $pause = false;
@@ -26,5 +26,10 @@ function cronitorMonitorTask($client, $closure, $exceptionHandler = false)
         if ($pause) {
             $client->pause((int) $pause);
         }
+
+        // Let's bubble that exception back up
+        throw $e;
     }
+
+    return $returns;
 }

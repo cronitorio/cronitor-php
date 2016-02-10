@@ -1,6 +1,6 @@
 <?php
 
-namespace Cronitor\Tests;
+namespace Cronitor\tests;
 
 use Cronitor\Client;
 use anlutro\cURL;
@@ -23,17 +23,21 @@ Connection: close';
 
     protected function getOkClient()
     {
-        $okCurl = $this->getOkCurl();
-
         $client = $this->getMockBuilder('\Cronitor\Client')
             ->setConstructorArgs(array('boogers'))
             ->setMethods(array('getcUrl'))
             ->getMock();
 
-        $client->expects($this->once())
-            ->method('getcUrl')
-            ->will($this->returnValue($okCurl));
+        $client = $this->setClientOkCurl($client);
 
+        return $client;
+    }
+
+    protected function setClientOkCurl($client)
+    {
+        $client->expects($this->atLeastOnce())
+            ->method('getcUrl')
+            ->will($this->returnValue($this->getOkCurl()));
         return $client;
     }
 
@@ -43,7 +47,7 @@ Connection: close';
             ->setMethods(array('sendRequest'))
             ->getMock();
 
-        $curl->expects($this->once())
+        $curl->expects($this->atLeastOnce())
             ->method('sendRequest')
             ->will($this->returnValue($this->okResponse));
 
