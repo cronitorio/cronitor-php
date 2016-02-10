@@ -77,4 +77,38 @@ The expected return value is an array with `msg` and `pause` as keys. `msg` is
 a string that will be url-encoded and `pause` is an integer representing the
 number of hours to pause alerts on this particular monitor.
 
+Interested in returning something from the closure? You sure can!
+
+```php
+$monitorId = 'id of the monitor found on the cronitor dashboard';
+$client = new Cronitor\Client($monitorId);
+
+$someValue = cronitorMonitorTask(
+  $client,
+  function(){
+    // do some stuff...
+    return 'heck yeah you can!';
+  }
+);
+```
+
+Also of note: `cronitorMonitorTask()` will rethrow the exception thrown so you can let whatever wraps the function handle the exception as well.
+
+```php
+$monitorId = 'id of the monitor found on the cronitor dashboard';
+$client = new Cronitor\Client($monitorId);
+
+try{
+  cronitorMonitorTask(
+    $client,
+    function(){
+      // do some stuff...
+      throw new Exception('Oh no, something happened!');
+    }
+  );
+} catch (Exception $e){
+  // Do some other stuff, like logging perhaps?
+}
+```
+
 Enjoy!
