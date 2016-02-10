@@ -15,5 +15,4 @@ class MonitorTaskTest extends TestBase
         $response = $client->run();
         $this->assertEquals($response->statusCode, 200);
     }
-
 }
