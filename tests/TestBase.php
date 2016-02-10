@@ -1,6 +1,6 @@
 <?php
 
-namespace Cronitor\tests;
+namespace Cronitor\Tests;
 
 use Cronitor\Client;
 use anlutro\cURL;
