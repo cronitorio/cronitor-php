@@ -23,7 +23,6 @@ Connection: close';
 
     protected function getOkClient()
     {
-
         $client = $this->getMockBuilder('\Cronitor\Client')
             ->setConstructorArgs(array('boogers'))
             ->setMethods(array('getcUrl'))
@@ -34,7 +33,8 @@ Connection: close';
         return $client;
     }
 
-    protected function setClientOkCurl($client){
+    protected function setClientOkCurl($client)
+    {
         $client->expects($this->atLeastOnce())
             ->method('getcUrl')
             ->will($this->returnValue($this->getOkCurl()));
