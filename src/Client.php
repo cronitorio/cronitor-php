@@ -15,16 +15,25 @@ class Client
         $this->authKey = $authKey;
     }
 
+    /**
+    * @codeCoverageIgnore
+    */
     public function setMonitorId($monitorId)
     {
         $this->monitorId = $monitorId;
     }
 
+    /**
+    * @codeCoverageIgnore
+    */
     public function setAuthKey($authKey)
     {
         $this->authKey = $authKey;
     }
 
+    /**
+    * @codeCoverageIgnore
+    */
     public function setBaseURI($baseURI)
     {
         $this->baseURI = $baseURI;
