@@ -5,7 +5,7 @@ namespace Cronitor\Tests;
 use Cronitor\Client;
 use anlutro\cURL;
 
-class ClientTest extends TestBase
+class MonitorTaskTest extends TestBase
 {
 
     public function test_it_should_run()
@@ -15,5 +15,4 @@ class ClientTest extends TestBase
         $response = $client->run();
         $this->assertEquals($response->statusCode, 200);
     }
-
 }
