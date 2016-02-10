@@ -1,6 +1,6 @@
 <?php
 
-namespace Cronitor\Tests;
+namespace Cronitor\tests;
 
 use Cronitor\Client;
 use anlutro\cURL;
@@ -14,7 +14,7 @@ class MonitorTaskTest extends TestBase
 
         $returns = cronitorMonitorTask(
             $client,
-            function(){
+            function () {
                 return 'it works!';
             }
         );
@@ -28,7 +28,7 @@ class MonitorTaskTest extends TestBase
 
         $returns = cronitorMonitorTask(
             $client,
-            function(){
+            function () {
             }
         );
 
@@ -55,7 +55,7 @@ class MonitorTaskTest extends TestBase
 
         $returns = cronitorMonitorTask(
             $client,
-            function() use ($msg) {
+            function () use ($msg) {
                 throw new \Exception($msg);
             }
         );
@@ -81,10 +81,10 @@ class MonitorTaskTest extends TestBase
 
         $returns = cronitorMonitorTask(
             $client,
-            function() use ($msg) {
+            function () use ($msg) {
                 throw new \Exception($msg);
             },
-            function($e, $client){
+            function ($e, $client) {
                 return array('msg' => $e->getMessage());
             }
         );
@@ -111,10 +111,10 @@ class MonitorTaskTest extends TestBase
 
         $returns = cronitorMonitorTask(
             $client,
-            function() use ($msg) {
+            function () use ($msg) {
                 throw new \Exception($msg);
             },
-            function($e, $client) use ($interval){
+            function ($e, $client) use ($interval) {
                 return array('msg' => $e->getMessage(), 'pause' => $interval);
             }
         );
