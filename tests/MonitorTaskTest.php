@@ -53,7 +53,7 @@ class MonitorTaskTest extends TestBase
             ->method('fail')
             ->with($msg);
 
-        $returns = cronitorMonitorTask(
+        cronitorMonitorTask(
             $client,
             function () use ($msg) {
                 throw new \Exception($msg);
@@ -79,12 +79,12 @@ class MonitorTaskTest extends TestBase
             ->method('fail')
             ->with($msg);
 
-        $returns = cronitorMonitorTask(
+        cronitorMonitorTask(
             $client,
             function () use ($msg) {
                 throw new \Exception($msg);
             },
-            function ($e, $client) {
+            function ($e) {
                 return array('msg' => $e->getMessage());
             }
         );
@@ -109,12 +109,12 @@ class MonitorTaskTest extends TestBase
             ->method('pause')
             ->with($interval);
 
-        $returns = cronitorMonitorTask(
+        cronitorMonitorTask(
             $client,
             function () use ($msg) {
                 throw new \Exception($msg);
             },
-            function ($e, $client) use ($interval) {
+            function ($e) use ($interval) {
                 return array('msg' => $e->getMessage(), 'pause' => $interval);
             }
         );
