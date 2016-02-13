@@ -2,7 +2,7 @@
 
 namespace Cronitor\Tests;
 
-use Cronitor\Client;
+use Cronitor\Caller;
 use anlutro\cURL;
 
 class MonitorTaskTest extends TestBase
@@ -10,10 +10,10 @@ class MonitorTaskTest extends TestBase
 
     public function test_it_should_return_value_on_success()
     {
-        $client = $this->getOkClient();
+        $caller = $this->getOkCaller();
 
         $returns = cronitorMonitorTask(
-            $client,
+            $caller,
             function () {
                 return 'it works!';
             }
@@ -24,10 +24,10 @@ class MonitorTaskTest extends TestBase
 
     public function test_it_should_return_null_value_on_success()
     {
-        $client = $this->getOkClient();
+        $caller = $this->getOkCaller();
 
         $returns = cronitorMonitorTask(
-            $client,
+            $caller,
             function () {
             }
         );
@@ -42,19 +42,19 @@ class MonitorTaskTest extends TestBase
     {
         $msg = 'This is bogus!';
 
-        $client = $this->getMockBuilder('\Cronitor\Client')
+        $caller = $this->getMockBuilder('\Cronitor\Caller')
             ->setConstructorArgs(array('boogers'))
             ->setMethods(array('getcUrl', 'fail'))
             ->getMock();
 
-        $client = $this->setClientOkCurl($client);
+        $caller = $this->setCallerOkCurl($caller);
 
-        $client->expects($this->once())
+        $caller->expects($this->once())
             ->method('fail')
             ->with($msg);
 
         cronitorMonitorTask(
-            $client,
+            $caller,
             function () use ($msg) {
                 throw new \Exception($msg);
             }
@@ -68,19 +68,19 @@ class MonitorTaskTest extends TestBase
     {
         $msg = 'This is super bogus!';
 
-        $client = $this->getMockBuilder('\Cronitor\Client')
+        $caller = $this->getMockBuilder('\Cronitor\Caller')
             ->setConstructorArgs(array('boogers'))
             ->setMethods(array('getcUrl', 'fail'))
             ->getMock();
 
-        $client = $this->setClientOkCurl($client);
+        $caller = $this->setCallerOkCurl($caller);
 
-        $client->expects($this->once())
+        $caller->expects($this->once())
             ->method('fail')
             ->with($msg);
 
         cronitorMonitorTask(
-            $client,
+            $caller,
             function () use ($msg) {
                 throw new \Exception($msg);
             },
@@ -98,19 +98,19 @@ class MonitorTaskTest extends TestBase
         $msg = 'This is mega bogus!';
         $interval = 2;
 
-        $client = $this->getMockBuilder('\Cronitor\Client')
+        $caller = $this->getMockBuilder('\Cronitor\Caller')
             ->setConstructorArgs(array('boogers'))
             ->setMethods(array('getcUrl', 'pause'))
             ->getMock();
 
-        $client = $this->setClientOkCurl($client);
+        $caller = $this->setCallerOkCurl($caller);
 
-        $client->expects($this->once())
+        $caller->expects($this->once())
             ->method('pause')
             ->with($interval);
 
         cronitorMonitorTask(
-            $client,
+            $caller,
             function () use ($msg) {
                 throw new \Exception($msg);
             },

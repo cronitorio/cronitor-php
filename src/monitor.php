@@ -1,11 +1,11 @@
 <?php
 
-function cronitorMonitorTask($client, $closure, $exceptionHandler = false)
+function cronitorMonitorTask($caller, $closure, $exceptionHandler = false)
 {
     try {
-        $client->run();
+        $caller->run();
         $returns = $closure();
-        $client->complete();
+        $caller->complete();
     } catch (Exception $e) {
         $pause = false;
 
@@ -17,14 +17,14 @@ function cronitorMonitorTask($client, $closure, $exceptionHandler = false)
             //     'msg'   => (string) 'Some string that will act as an error message',
             //     'pause' => (int) The number of hours to pause this monitor for
             // )
-            $handled = $exceptionHandler($e, $client);
+            $handled = $exceptionHandler($e, $caller);
             extract($handled);
         }
 
-        $client->fail($msg);
+        $caller->fail($msg);
 
         if ($pause) {
-            $client->pause((int) $pause);
+            $caller->pause((int) $pause);
         }
 
         // Let's bubble that exception back up

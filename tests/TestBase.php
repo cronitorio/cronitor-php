@@ -2,12 +2,12 @@
 
 namespace Cronitor\Tests;
 
-use Cronitor\Client;
+use Cronitor\Caller;
 use anlutro\cURL;
 
 class TestBase extends \PHPUnit_Framework_TestCase
 {
-    public $client;
+    public $caller;
     protected $okResponse;
 
     public function setUp()
@@ -21,24 +21,24 @@ Connection: close';
         $this->okResponse = new cURL\Response('', $okHeaders);
     }
 
-    protected function getOkClient()
+    protected function getOkCaller()
     {
-        $client = $this->getMockBuilder('\Cronitor\Client')
+        $caller = $this->getMockBuilder('\Cronitor\Caller')
             ->setConstructorArgs(array('boogers'))
             ->setMethods(array('getcUrl'))
             ->getMock();
 
-        $client = $this->setClientOkCurl($client);
+        $caller = $this->setCallerOkCurl($caller);
 
-        return $client;
+        return $caller;
     }
 
-    protected function setClientOkCurl($client)
+    protected function setCallerOkCurl($caller)
     {
-        $client->expects($this->atLeastOnce())
+        $caller->expects($this->atLeastOnce())
             ->method('getcUrl')
             ->will($this->returnValue($this->getOkCurl()));
-        return $client;
+        return $caller;
     }
 
     protected function getOkcUrl()

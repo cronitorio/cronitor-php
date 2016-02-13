@@ -2,7 +2,7 @@
 
 namespace Cronitor;
 
-class Client
+class Caller
 {
 
     protected $monitorId;
