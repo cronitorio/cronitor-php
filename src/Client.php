@@ -44,12 +44,12 @@ class Client
         return new \anlutro\cURL\cURL;
     }
 
-    public function run($msg)
+    public function run($msg = null)
     {
         return $this->request('run', ['msg' => $msg]);
     }
 
-    public function fail($msg)
+    public function fail($msg = null)
     {
         return $this->request('fail', ['msg' => $msg]);
     }
@@ -59,7 +59,7 @@ class Client
         return $this->request('pause/' . (int) $duration);
     }
 
-    public function complete($msg)
+    public function complete($msg = null)
     {
         return $this->request('complete', ['msg' => $msg]);
     }
