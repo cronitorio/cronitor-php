@@ -7,7 +7,6 @@ use anlutro\cURL;
 
 class ClientTest extends TestBase
 {
-
     public function test_it_should_run()
     {
         $client = $this->getOkClient();

@@ -7,7 +7,6 @@ use anlutro\cURL;
 
 class MonitorTaskTest extends TestBase
 {
-
     public function test_it_should_return_value_on_success()
     {
         $client = $this->getOkClient();
