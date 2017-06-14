@@ -4,7 +4,6 @@ namespace Cronitor;
 
 class Client
 {
-
     protected $monitorId;
     protected $authKey;
     protected $baseURI = 'https://cronitor.link';
