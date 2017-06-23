@@ -51,7 +51,7 @@ class MonitorTaskTest extends TestBase
 
         $client->expects($this->once())
             ->method('fail')
-            ->with($msg);
+            ->with("Exception with message '{$msg}'");
 
         cronitorMonitorTask(
             $client,
