@@ -10,7 +10,7 @@ function cronitorMonitorTask($client, $closure, $exceptionHandler = false)
         $pause = false;
 
         if (!$exceptionHandler) {
-            $msg = $e->getMessage();
+            $msg = get_class($e) . " with message '" . $e->getMessage() . "'";
         } else {
             // $exceptionHandler should return an array like the following:
             // array(
