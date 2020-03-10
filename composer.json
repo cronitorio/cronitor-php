@@ -1,5 +1,5 @@
 {
-  "name": "nathanielks/cronitor-io-php",
+  "name": "cronitor/cronitor-php",
   "description": "Simple php client for communication with Cronitor.io",
   "license": "MIT",
   "authors": [
