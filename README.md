@@ -16,7 +16,7 @@
 Using [composer](https://packagist.org/packages/nathanielks/cronitor-io-php):
 
 ```bash
-$ composer require nathanielks/cronitor-io-php
+$ composer require cronitorio/cronitor-php
 ```
 
 ## Requirements
