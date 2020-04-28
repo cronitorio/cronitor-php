@@ -19,7 +19,7 @@ This library provides a simple abstraction for the pinging of a Cronitor monitor
 Using [composer](https://packagist.org/packages/nathanielks/cronitor-io-php):
 
 ```bash
-$ composer require cronitorio/cronitor-php
+$ composer require cronitor/cronitor-php
 ```
 
 ## Requirements
