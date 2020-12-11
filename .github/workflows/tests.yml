@@ -30,6 +30,11 @@ jobs:
       - name: Run Test Suite
         run: vendor/bin/phpunit --verbose --coverage-clover=coverage.clover
 
+      - name: Send Coverage Report to Scrutinizer
+        run: |
+          wget https://scrutinizer-ci.com/ocular.phar
+          php ocular.phar code-coverage:upload --format=php-clover coverage.clover;
+
   windows_tests:
     name: PHP ${{ matrix.php }} on Windows
     runs-on: windows-latest
