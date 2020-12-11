@@ -18,10 +18,7 @@
   "autoload": {
     "psr-4": {
       "Cronitor\\": "src/"
-    },
-    "files": [
-      "src/monitor.php"
-    ]
+    }
   },
   "autoload-dev": {
     "psr-4": {
