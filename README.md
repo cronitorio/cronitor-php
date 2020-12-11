@@ -2,7 +2,7 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/?branch=master)
 
-# Cronitor Ping API Client
+# Cronitor PHP SDK
 
 Cronitor is a service for heartbeat-style monitoring of anything that can send an HTTP request. It's particularly well suited for monitoring cron jobs, Laravel scheduled tasks, or any other background task.
 
