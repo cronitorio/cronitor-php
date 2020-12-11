@@ -1,0 +1,61 @@
+name: Cronitor SDK tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux_tests:
+    name: PHP ${{ matrix.php }} on Linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 7.4 ]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, http
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer install -no-interaction --prefer-dist
+
+      - name: Run Test Suite
+        run: vendor/bin/phpunit --verbose --coverage-clover=coverage.clover
+
+  windows_tests:
+    name: PHP ${{ matrix.php }} on Windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        php: [ 7.4 ]
+    steps:
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, http
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Dependencies
+        run: composer install -no-interaction --prefer-dist
+
+      - name: Run Test Suite
+        run: vendor/bin/phpunit --verbose
