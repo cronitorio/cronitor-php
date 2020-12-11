@@ -2,15 +2,16 @@
 
 namespace Cronitor\Tests;
 
-use Cronitor\Client;
 use anlutro\cURL;
+use Cronitor\Client;
+use PHPUnit\Framework\TestCase;
 
-class TestBase extends \PHPUnit_Framework_TestCase
+class TestBase extends TestCase
 {
     public $client;
     protected $okResponse;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $okHeaders = 'HTTP/1.1 200 OK
 Server: nginx/1.4.6 (Ubuntu)
