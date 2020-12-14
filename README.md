@@ -88,17 +88,14 @@ It is quite simple to create a new Monitor, all you need to do is pass through a
 require __DIR__ . '/vendor/autoload.php';
 
 use Cronitor\Cronitor;
-use Cronitor\DTO\MonitorTransferObject;
 
 $cronitor = Cronitor::config(__DIR__ . '/test.yml');
 
-$monitor = $cronitor->monitor->put(
-    MonitorTransferObject::build(
-        'job', // Monitor Type
-        '12345', // Monitor Key
-        'every 5 minutes' // Schedule
-    )
-);
+$monitor = $cronitor->monitor->put([
+    'job', // Monitor Type
+    '12345', // Monitor Key
+    'every 5 minutes' // Schedule
+]);
 ```
 
 

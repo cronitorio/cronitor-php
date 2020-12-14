@@ -62,7 +62,7 @@ class Monitor
             try {
                 $response = $this->http->post(
                     'https://cronitor.io/api/monitors',
-                    (array) $monitor,
+                    $monitor,
                     array_merge(
                         $this->defaultHeaders(),
                         (new BasicStrategy(
