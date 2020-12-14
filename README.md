@@ -92,9 +92,14 @@ use Cronitor\Cronitor;
 $cronitor = Cronitor::config(__DIR__ . '/test.yml');
 
 $monitor = $cronitor->monitor->put([
-    'job', // Monitor Type
-    '12345', // Monitor Key
-    'every 5 minutes' // Schedule
+    'monitors' => [
+        [
+            'type' => \Cronitor\Resources\Monitor::JOB,
+            'key' => '123456',
+            'schedule' => 'every 5 days'
+        ]
+    ],
+    'rollback' => true
 ]);
 ```
 
