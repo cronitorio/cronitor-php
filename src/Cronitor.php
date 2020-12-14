@@ -33,6 +33,11 @@ class Cronitor
     protected string $userAgent = 'cronitor-php';
 
     /**
+     * @var string
+     */
+    protected ?string $configFile = null;
+
+    /**
      * @var ContainerInterface
      */
     protected ContainerInterface $container;
@@ -46,12 +51,14 @@ class Cronitor
     public function __construct(
         string $apiKey,
         string $environment,
-        string $version = '2020-10-01'
+        string $version = '2020-10-01',
+        ?string $file = null
     ) {
         $this->setApiKey($apiKey)
             ->setApiVersion($version)
             ->setEnvironment($environment)
-            ->setContainer();
+            ->setContainer()
+            ->setConfigFile($file);
     }
 
     /**
@@ -76,7 +83,8 @@ class Cronitor
         return new self(
             $contents['api_key'],
             $contents['environment'],
-            $contents['api_version'] ?? null
+            $contents['api_version'] ?? null,
+            $file
         );
     }
 
@@ -137,6 +145,13 @@ class Cronitor
             $this->environment,
             $this->userAgent,
         ));
+
+        return $this;
+    }
+
+    public function setConfigFile(?string $file = null): self
+    {
+        $this->configFile = $file;
 
         return $this;
     }
