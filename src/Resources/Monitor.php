@@ -2,14 +2,29 @@
 
 namespace Cronitor\Resources;
 
-use Cronitor\Exceptions\ResourceException;
 use Exception;
-use JustSteveKing\HttpAuth\Strategies\BasicStrategy;
 use JustSteveKing\HttpSlim\HttpClient;
+use Cronitor\Exceptions\ResourceException;
 use Symfony\Component\HttpClient\Psr18Client;
+use JustSteveKing\HttpAuth\Strategies\BasicStrategy;
 
 class Monitor
 {
+    /**
+     * @var string
+     */
+    public const JOB = 'job';
+
+    /**
+     * @var string
+     */
+    public const EVENT = 'event';
+
+    /**
+     * @var string
+     */
+    public const SYNTHETIC = 'synthetic';
+
     /**
      * @var string
      */
@@ -53,30 +68,26 @@ class Monitor
         );
     }
 
-    /**
-     * @param mixed ...$monitors
-     */
-    public function put(...$monitors)
-    {
-        foreach ($monitors as $monitor) {
-            try {
-                $response = $this->http->post(
-                    'https://cronitor.io/api/monitors',
-                    $monitor,
-                    array_merge(
-                        $this->defaultHeaders(),
-                        (new BasicStrategy(
-                            base64_encode("{$this->apiKey}:")
-                        ))->getHeader('Basic')
-                    )
-                );
-                dump($response->getStatusCode());
-            } catch (Exception $e) {
-                throw new ResourceException($e->getMessage());
-            }
 
-            dd($response->getBody()->getContents());
+    public function put($payload)
+    {
+        try {
+            $response = $this->http->put(
+                'https://cronitor.io/api/monitors',
+                $payload,
+                array_merge(
+                    $this->defaultHeaders(),
+                    (new BasicStrategy(
+                        base64_encode("{$this->apiKey}:")
+                    ))->getHeader('Basic')
+                )
+            );
+            dump($response->getStatusCode());
+        } catch (Exception $e) {
+            throw new ResourceException($e->getMessage());
         }
+
+        dd($response->getBody()->getContents());
     }
 
     /**
