@@ -80,7 +80,7 @@ Once you have your Cronitor object you will want to start working with monitors:
 
 ### Create a new Monitor
 
-It is quite simple to create a new Monitor, all you need to do is pass through a `MonitorTransferObject` that has been built.
+It is quite simple to create a new Monitor, all you need to do is pass through an array.
 
 ```php
 <?php declare(strict_types=1);
