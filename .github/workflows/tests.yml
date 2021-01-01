@@ -28,7 +28,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run Test Suite
-        run: vendor/bin/phpunit --verbose --coverage-clover=coverage.clover
+        run: vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --testdox
 
   windows_tests:
     name: PHP ${{ matrix.php }} on Windows
@@ -58,4 +58,4 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run Test Suite
-        run: vendor/bin/phpunit --verbose
+        run: vendor/bin/phpunit --verbose --testdox
