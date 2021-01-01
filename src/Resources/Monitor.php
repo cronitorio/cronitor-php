@@ -123,9 +123,25 @@ class Monitor
         ];
     }
 
-    public function delete()
+    public function delete($payload)
     {
-        //
+        if (\is_string($payload)) {
+            $response = $this->makeRequest(
+                'DELETE',
+                'https://cronitor.io/api/monitors' . $payload,
+            );
+
+            exit;
+        }
+
+        foreach ($payload as $item) {
+            $response = $this->makeRequest(
+                'DELETE',
+                'https://cronitor.io/api/monitors' . $item,
+            );
+        }
+
+        return $response;
     }
 
     public function ping()
@@ -168,5 +184,24 @@ class Monitor
     public function ok()
     {
         //
+    }
+
+    public function makeRequest(string $method, string $uri): Response
+    {
+        try {
+            $response = $this->http->{$method}(
+                $uri,
+                array_merge(
+                    $this->defaultHeaders(),
+                    (new BasicStrategy(
+                        base64_encode("{$this->apiKey}:")
+                    ))->getHeader('Basic')
+                )
+            );
+        } catch (Exception $e) {
+            throw new ResourceException($e->getMessage());
+        }
+
+        return $response;
     }
 }

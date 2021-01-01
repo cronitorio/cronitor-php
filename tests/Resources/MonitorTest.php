@@ -144,4 +144,30 @@ class MonitorTest extends TestCase
             $this->cronitor->monitor->defaultHeaders()
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_allows_me_to_delete_a_single_monitor()
+    {
+        $response = $this->cronitor->monitor->delete('1234');
+
+        $this->assertInstanceOf(
+            Response::class,
+            $response
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function it_allows_me_to_send_multiple_delete_requests()
+    {
+        $response = $this->cronitor->monitor->delete('1234', '5678');
+
+        $this->assertInstanceOf(
+            Response::class,
+            $response
+        );
+    }
 }
