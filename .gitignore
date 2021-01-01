@@ -4,3 +4,4 @@
 /examples
 /build
 .phpunit.result.cache
+phpunit.xml.bak
