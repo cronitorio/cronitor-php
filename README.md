@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/nathanielks/cronitor-io-php.svg?branch=master)](https://travis-ci.org/nathanielks/cronitor-io-php)
+![Cronitor SDK tests](https://github.com/cronitorio/cronitor-php/workflows/Cronitor%20SDK%20tests/badge.svg)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/?branch=master)
 
