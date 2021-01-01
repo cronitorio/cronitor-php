@@ -7,6 +7,7 @@ use Nyholm\Psr7\Response;
 use Cronitor\Resources\Monitor;
 use PHPUnit\Framework\TestCase;
 use JustSteveKing\HttpSlim\HttpClient;
+use Cronitor\Exceptions\ResourceException;
 use Symfony\Component\HttpClient\Psr18Client;
 
 class MonitorTest extends TestCase
@@ -76,6 +77,29 @@ class MonitorTest extends TestCase
     /**
      * @test
      */
+    public function it_throws_an_exception_on_http_failure()
+    {
+        $this->expectException(ResourceException::class);
+
+        $this->cronitor->monitor->getHttp()->getClient()->addException(
+            new ResourceException('failed to do something')
+        );
+
+        $response = $this->cronitor->monitor->put([
+            'monitors' => [
+                [
+                    'type' => \Cronitor\Resources\Monitor::JOB,
+                    'key' => '123456',
+                    'schedule' => 'every 5 days'
+                ]
+            ],
+            'rollback' => true
+        ]);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_send_a_data_request()
     {
         $response = $this->cronitor->monitor->data('1234');
@@ -89,6 +113,20 @@ class MonitorTest extends TestCase
             200,
             $response->getStatusCode()
         );
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_an_exception_on_data_call_being_unsuccessfull()
+    {
+        $this->expectException(ResourceException::class);
+
+        $this->cronitor->monitor->getHttp()->getClient()->addException(
+            new ResourceException('failed to do something')
+        );
+
+        $response = $this->cronitor->monitor->data('does-not-exist');
     }
 
     /**

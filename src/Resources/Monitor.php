@@ -103,6 +103,14 @@ class Monitor
     }
 
     /**
+     * @return HttpClient
+     */
+    public function getHttp(): HttpClient
+    {
+        return $this->http;
+    }
+
+    /**
      * @return array
      */
     public function defaultHeaders(): array
