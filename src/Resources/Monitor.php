@@ -3,6 +3,7 @@
 namespace Cronitor\Resources;
 
 use Exception;
+use Nyholm\Psr7\Response;
 use JustSteveKing\HttpSlim\HttpClient;
 use Cronitor\Exceptions\ResourceException;
 use Symfony\Component\HttpClient\Psr18Client;
@@ -69,7 +70,7 @@ class Monitor
     }
 
 
-    public function put($payload)
+    public function put($payload): Response
     {
         try {
             $response = $this->http->put(
@@ -124,9 +125,26 @@ class Monitor
         //
     }
 
-    public function data()
+    /**
+     * @param string $key The key of the monitor to get data on.
+     */
+    public function data(string $key): Response
     {
-        //
+        try {
+            $response = $this->http->get(
+                'https://cronitor.io/api/monitors/' . $key,
+                array_merge(
+                    $this->defaultHeaders(),
+                    (new BasicStrategy(
+                        base64_encode("{$this->apiKey}:")
+                    ))->getHeader('Basic')
+                )
+            );
+        } catch (Exception $e) {
+            throw new ResourceException($e->getMessage());
+        }
+
+        return $response;
     }
 
     public function pause()

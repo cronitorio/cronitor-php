@@ -76,6 +76,24 @@ class MonitorTest extends TestCase
     /**
      * @test
      */
+    public function it_can_send_a_data_request()
+    {
+        $response = $this->cronitor->monitor->data('1234');
+
+        $this->assertInstanceOf(
+            Response::class,
+            $response
+        );
+
+        $this->assertEquals(
+            200,
+            $response->getStatusCode()
+        );
+    }
+
+    /**
+     * @test
+     */
     public function it_has_the_correct_default_headers()
     {
         $this->assertEquals(
