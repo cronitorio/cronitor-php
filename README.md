@@ -1,8 +1,23 @@
+# Cronitor PHP SDK
+
+<!-- BADGES_START -->
+[![Latest Version][badge-release]][packagist]
+[![PHP Version][badge-php]][php]
+[![Total Downloads][badge-downloads]][downloads]
 ![Cronitor SDK tests](https://github.com/cronitorio/cronitor-php/workflows/Cronitor%20SDK%20tests/badge.svg)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/nathanielks/cronitor-io-php/?branch=master)
 
-# Cronitor PHP SDK
+
+[badge-release]: https://img.shields.io/packagist/v/cronitor/cronitor-php.svg?style=flat-square&label=release
+[badge-php]: https://img.shields.io/packagist/php-v/cronitor/cronitor-php.svg?style=flat-square
+[badge-downloads]: https://img.shields.io/packagist/dt/cronitor/cronitor-php.svg?style=flat-square&colorB=mediumvioletred
+
+[packagist]: https://packagist.org/packages/cronitor/cronitor-php
+[php]: https://php.net
+[downloads]: https://packagist.org/packages/cronitor/cronitor-php
+
+<!-- BADGES_END -->
 
 Cronitor is a service for heartbeat-style monitoring of anything that can send an HTTP request. It's particularly well suited for monitoring cron jobs, Laravel scheduled tasks, or any other background task.
 
