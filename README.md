@@ -41,10 +41,8 @@ $ composer require cronitor/cronitor-php
 
 The following versions of PHP are supported by this version.
 
-+ PHP 5.4
-+ PHP 5.5
-+ PHP 5.6
-+ PHP 7.0
++ PHP 7.4
++ PHP 8.0
 
 ## Instructions
 
@@ -60,7 +58,6 @@ This way will allow you to point to a file location and load in your typical cro
 api_key: '123456-api-key-123456'
 environment: 'staging'
 api_version: '2020-10-27'
-
 ```
 
 ```php
@@ -85,7 +82,8 @@ require __DIR__ . '/vendor/autoload.php';
 $cronitor = new Cronitor(
     '123456-api-key-123456', // API Key
     'staging', // Local Environment
-    '2020-10-27' // API Version - this is not required
+    '2020-10-27', // API Version - this is not required
+    __DIR__ . '/../config/cronitor.yml' // Config File - this is completely optional
 )
 ```
 
@@ -116,6 +114,22 @@ $monitor = $cronitor->monitor->put([
     ],
     'rollback' => true
 ]);
+```
+
+### Getting information about a Monitor that has ran
+
+Sometimes you want to look at past runs of a monitor, and want to see what data is stored on your monitor:
+
+```php
+<?php declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Cronitor\Cronitor;
+
+$cronitor = Cronitor::config(__DIR__ . '/test.yml');
+
+$monitor = $cronitor->monitor->data('key-of-monitor');
 ```
 
 
