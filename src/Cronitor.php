@@ -100,6 +100,14 @@ class Cronitor
     }
 
     /**
+     * @return string
+     */
+    public function getApiKey(): string
+    {
+        return $this->apiKey;
+    }
+
+    /**
      * @param string $environment
      * @return self
      */
@@ -108,6 +116,14 @@ class Cronitor
         $this->environment = $environment;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEnvironment(): string
+    {
+        return $this->environment;
     }
 
     /**
@@ -120,6 +136,13 @@ class Cronitor
 
         return $this;
     }
+    /**
+     * @return string
+     */
+    public function getApiVersion(): string
+    {
+        return $this->apiVersion;
+    }
 
     /**
      * @param string $userAgent
@@ -130,6 +153,14 @@ class Cronitor
         $this->userAgent = $userAgent;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUserAgent(): string
+    {
+        return $this->userAgent;
     }
 
     /**
@@ -149,11 +180,31 @@ class Cronitor
         return $this;
     }
 
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
+
     public function setConfigFile(?string $file = null): self
     {
         $this->configFile = $file;
 
         return $this;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getConfigFile():? string
+    {
+        if (isset($this->configFile)) {
+            return $this->configFile;
+        }
+
+        return null;
     }
 
     public function __get(string $name)

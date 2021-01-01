@@ -82,12 +82,23 @@ class Monitor
                     ))->getHeader('Basic')
                 )
             );
-            dump($response->getStatusCode());
         } catch (Exception $e) {
             throw new ResourceException($e->getMessage());
         }
 
-        dd($response->getBody()->getContents());
+        return $response;
+    }
+
+    /**
+     * @param HttpClient $http
+     *
+     * @return $this
+     */
+    public function setHttp(HttpClient $http): self
+    {
+        $this->http = $http;
+
+        return $this;
     }
 
     /**

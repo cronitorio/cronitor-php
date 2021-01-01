@@ -2,3 +2,5 @@
 .DS_Store
 /coverage
 /examples
+/build
+.phpunit.result.cache
