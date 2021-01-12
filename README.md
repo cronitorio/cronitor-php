@@ -132,5 +132,22 @@ $cronitor = Cronitor::config(__DIR__ . '/test.yml');
 $monitor = $cronitor->monitor->data('key-of-monitor');
 ```
 
+### Deleting an old monitor, or multiple monitors
+
+Sometime you want to stop monitoring something, you can pass in as many keys as you need to this method which will cycle through each one for you.
+
+```php
+<?php declare(strict_types=1);
+
+require __DIR__ . '/vendor/autoload.php';
+
+use Cronitor\Cronitor;
+
+$cronitor = Cronitor::config(__DIR__ . '/test.yml');
+
+$monitor = $cronitor->monitor->delete('monitor-key'); // Delete a single monitor.
+$onitors = $cronitor->monitor->delete('monitor-key', 'another-key', 'and-so-on'); // Delete multiple monitors.
+```
+
 
 More documentation and examples coming soon ...
