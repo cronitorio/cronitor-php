@@ -16,7 +16,8 @@
         "symfony/http-client": "^5.2",
         "juststeveking/http-slim": "^1.2",
         "juststeveking/http-auth-strategies": "^1.2",
-        "squizlabs/php_codesniffer": "^3.5"
+        "squizlabs/php_codesniffer": "^3.5",
+        "juststeveking/uri-builder": "^1.1"
     },
     "autoload": {
         "psr-4": {

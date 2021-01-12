@@ -4,6 +4,7 @@ namespace Cronitor\Resources;
 
 use Exception;
 use Nyholm\Psr7\Response;
+use JustSteveKing\UriBuilder\Uri;
 use JustSteveKing\HttpSlim\HttpClient;
 use Cronitor\Exceptions\ResourceException;
 use Symfony\Component\HttpClient\Psr18Client;
@@ -128,7 +129,7 @@ class Monitor
         if (\is_string($payload)) {
             $response = $this->makeRequest(
                 'DELETE',
-                'https://cronitor.io/api/monitors' . $payload,
+                "https://cronitor.io/api/monitors/{$payload}"
             );
 
             exit;
@@ -137,16 +138,29 @@ class Monitor
         foreach ($payload as $item) {
             $response = $this->makeRequest(
                 'DELETE',
-                'https://cronitor.io/api/monitors' . $item,
+                "https://cronitor.io/api/monitors/{$item}"
             );
         }
 
         return $response;
     }
 
-    public function ping()
+    public function ping(string $key, ...$options)
     {
-        //
+        $url = Uri::fromString("https://cronitor.link/ping/{$this->apiKey}/{$key}");
+
+        if (\is_array($options)) {
+            foreach ($options as $key => $value) {
+                $url->addQueryParam($key, $value);
+            }
+        }
+
+        $response = $this->makeRequest(
+            'GET',
+            $url->toString()
+        );
+
+        return $response;
     }
 
     /**
