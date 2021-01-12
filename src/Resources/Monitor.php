@@ -132,7 +132,7 @@ class Monitor
                 "https://cronitor.io/api/monitors/{$payload}"
             );
 
-            exit;
+            return $response;
         }
 
         foreach ($payload as $item) {

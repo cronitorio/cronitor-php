@@ -77,6 +77,26 @@ class MonitorTest extends TestCase
     /**
      * @test
      */
+    public function it_can_send_delete_requests()
+    {
+        $response = $this->cronitor->monitor->delete('1234', '5678');
+
+        $this->assertInstanceOf(
+            Response::class,
+            $response
+        );
+
+        $response = $this->cronitor->monitor->delete('1234');
+
+        $this->assertInstanceOf(
+            Response::class,
+            $response
+        );
+    }
+
+    /**
+     * @test
+     */
     public function it_throws_an_exception_on_http_failure()
     {
         $this->expectException(ResourceException::class);
@@ -142,32 +162,6 @@ class MonitorTest extends TestCase
                 'Cronitor-Version' => $this->cronitor->getApiVersion(),
             ],
             $this->cronitor->monitor->defaultHeaders()
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function it_allows_me_to_delete_a_single_monitor()
-    {
-        $response = $this->cronitor->monitor->delete('1234');
-
-        $this->assertInstanceOf(
-            Response::class,
-            $response
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function it_allows_me_to_send_multiple_delete_requests()
-    {
-        $response = $this->cronitor->monitor->delete('1234', '5678');
-
-        $this->assertInstanceOf(
-            Response::class,
-            $response
         );
     }
 }
