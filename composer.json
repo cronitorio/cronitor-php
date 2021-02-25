@@ -1,27 +1,29 @@
 {
   "name": "cronitor/cronitor-php",
-  "description": "Simple php client for communication with Cronitor.io",
+  "description": "Cronitor PHP Library",
+  "keywords": [
+    "cronitor",
+    "api"
+  ],
+  "homepage": "https://cronitor.io/",
   "license": "MIT",
   "authors": [
     {
-      "name": "Nathaniel Schweinberg",
-      "email": "nathaniel@fightthecurrent.org"
+      "name": "Cronitor"
     }
   ],
   "require": {
-    "php": ">=5.4.0",
-    "anlutro/curl": "~1.4"
+    "php": ">=5.6.0",
+    "symfony/yaml": "^4.4"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4.6"
+    "phpunit/phpunit": "^5.7",
+    "friendsofphp/php-cs-fixer": "^2.18"
   },
   "autoload": {
     "psr-4": {
-      "Cronitor\\": "src/"
-    },
-    "files": [
-      "src/monitor.php"
-    ]
+      "Cronitor\\": "lib/"
+    }
   },
   "autoload-dev": {
     "psr-4": {
