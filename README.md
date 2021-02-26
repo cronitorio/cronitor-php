@@ -30,7 +30,7 @@ $environment = 'staging';
 $cronitor = new Cronitor\CronitorClient($apiKey, $apiVersion, $environment);
 ```
 
-You can also use a YAML config file to manage all of your monitors (_see Create and Update Monitors section below_). The path to this file can be supplied using the enviroment variable `CRONITOR_CONFIG` or call `->readConfig()`.
+You can also use a YAML config file to manage all of your monitors (_see Create and Update Monitors section below_). The path to this file can be supplied using the enviroment variable `CRONITOR_CONFIG` or call `$cronitor->readConfig()`.
 
 ```php
 $cronitor->readConfig('./path/to/cronitor.yaml');
