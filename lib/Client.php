@@ -1,29 +1,7 @@
 <?php
 namespace Cronitor;
 
-class Monitors
-{
-    public $apiKey;
-    public $apiVersion;
-
-    public function __construct($apiKey, $apiVersion)
-    {
-        $this->apiKey = $apiKey;
-        $this->apiVersion = $apiVersion;
-    }
-
-    public function put($params)
-    {
-        return Monitor::put($this->apiKey, $this->apiVersion, $params);
-    }
-
-    public function delete($key)
-    {
-        return Monitor::delete($this->apiKey, $this->apiVersion, $key);
-    }
-}
-
-class CronitorClient
+class Client
 {
     private const MONITOR_TYPES = ['job', 'event', 'synthetic'];
     private const BASE_CONFIG_KEYS = ['apiKey', 'apiVersion', 'environment'];
@@ -33,7 +11,7 @@ class CronitorClient
     public $apiVersion;
     public $monitors;
 
-    public function __construct($apiKey, $apiVersion = null, $enviornment = null)
+    public function __construct($apiKey, $apiVersion = null, $environment = null)
     {
         $this->apiKey = $apiKey ?: getenv('CRONITOR_API_KEY');
         $this->apiVersion = $apiVersion ?: getenv('CRONITOR_API_VERSION');
