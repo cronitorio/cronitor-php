@@ -60,11 +60,11 @@ class HttpClient
 
     private function headers()
     {
-        return array(
+        return [
             'Content-Type: application/json',
             'Accept: application/json',
             'User-Agent: cronitor-php',
             "Cronitor-Version: $this->apiVersion",
-        );
+        ];
     }
 }

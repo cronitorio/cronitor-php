@@ -55,7 +55,7 @@ class CronitorClient
     {
         $this->config = $path ?: $this->config;
         if (!$this->config) {
-            throw new ConfigurationException("Must include a path by setting Cronitor.config or passing a path to read_config e.g. Cronitor.read_config('./cronitor.yaml')");
+            throw new ConfigurationException("Must include a path by passing a path to readConfig e.g. \$cronitor->readConfig('./cronitor.yaml')");
         }
 
         $conf = \Symfony\Component\Yaml\Yaml::parseFile($this->config);
@@ -124,15 +124,15 @@ class CronitorClient
     {
         $monitor = $this->monitor($key);
         $series = microtime(true);
-        $monitor.ping(['state' => 'run', 'series' => $series]);
+        $monitor->ping(['state' => 'run', 'series' => $series]);
 
         try {
             $callback();
-            $monitor.ping(['state' => 'complete', 'series' => $series]);
+            $monitor->ping(['state' => 'complete', 'series' => $series]);
         } catch (Exception $e) {
             $message = $e->getMessage();
-            $truncatedMessage = $message.substr(abs(min(0, 1600 - strlen($message))));
-            $monitor.ping([
+            $truncatedMessage = substr($message, abs(min(0, 1600 - strlen($message))));
+            $monitor->ping([
                 'state' => 'fail',
                 'message' => $truncatedMessage,
                 'series' => $series
