@@ -42,8 +42,9 @@ $cronitor->readConfig('./path/to/cronitor.yaml');
 The quickest way to start using this library is to wrap a block of code with the `#job` helper. It will report the start time, end time, and exit state to Cronitor. If an exception is raised, the stack trace will be included in the failure message.
 
 ```php
-$cronitor->job('warehouse-replenishmenth-report', function() {
-  new ReplenishmentReport(time())->run();
+$closureVar = time();
+$cronitor->job('warehouse-replenishmenth-report', function() use ($closureVar){
+  new ReplenishmentReport($closureVar)->run();
 });
 ```
 
