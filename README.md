@@ -27,7 +27,7 @@ These can be supplied using the environment variables `CRONITOR_API_KEY`, `CRONI
 $apiKey = 'apiKey123';
 $apiVersion = '2020-10-01';
 $environment = 'staging';
-$cronitor = new Cronitor\CronitorClient($apiKey, $apiVersion, $environment);
+$cronitor = new Cronitor\Client($apiKey, $apiVersion, $environment);
 ```
 
 You can also use a YAML config file to manage all of your monitors (_see Create and Update Monitors section below_). The path to this file can be supplied using the enviroment variable `CRONITOR_CONFIG` or call `$cronitor->readConfig()`.
