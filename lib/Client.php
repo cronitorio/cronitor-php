@@ -106,7 +106,7 @@ class Client
 
         try {
             $callback();
-            $monitor->ping(['state' => 'complete', 'series' => $series]);
+            return $monitor->ping(['state' => 'complete', 'series' => $series]);
         } catch (Exception $e) {
             $message = $e->getMessage();
             $truncatedMessage = substr($message, abs(min(0, 1600 - strlen($message))));
