@@ -10,12 +10,14 @@ class Monitor
     private const PING_RETRY_THRESHOLD = 5;
 
     public $apiKey;
+    public $apiVersion;
     public $key;
     public $env;
 
-    public function __construct($key, $apiKey = null, $env = null)
+    public function __construct($key, $apiKey = null, $apiVersion = null, $env = null)
     {
         $this->apiKey = $apiKey;
+        $this->apiVersion = $apiVersion;
         $this->key = $key;
         $this->env = $env;
 
