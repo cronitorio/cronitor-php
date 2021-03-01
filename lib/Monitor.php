@@ -6,7 +6,7 @@ class Monitor
 {
     private const BASE_MONITOR_API_URL = 'https://cronitor.io/api/monitors';
     private const BASE_PING_API_URL = "https://cronitor.link/p";
-    private const BASE_FALLBACK_PING_URL = "https://cronitor.link/p";
+    private const BASE_FALLBACK_PING_API_URL = "https://cronitor.link/p";
     private const PING_RETRY_THRESHOLD = 5;
 
     public $apiKey;
@@ -76,7 +76,7 @@ class Monitor
 
     public function ping($params = array())
     {
-        $retryCount = $params['retryCount'] ?: 0;
+        $retryCount = isset($params['retryCount']) ? $params['retryCount'] : 0;
 
         if (!$this->apiKey) {
             \error_log('No API key detected. Set Cronitor.api_key or initialize Monitor with an api_key:', 0);
@@ -86,7 +86,7 @@ class Monitor
         try {
             $queryString = $this->buildPingQuery($params);
             $client = $this->getPingClient($retryCount);
-            $response = $client->get("/?$queryString");
+            $response = $client->get("?$queryString");
             $responseCode = $response['code'];
 
             if ($responseCode < 200 || $responseCode > 299) {
@@ -95,7 +95,7 @@ class Monitor
             }
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // rescue instances of StandardError i.e. Timeout::Error, SocketError, etc
             \error_log("Cronitor Telemetry Error: $e", 0);
             if ($retryCount >= self::PING_RETRY_THRESHOLD) {
@@ -103,7 +103,7 @@ class Monitor
             }
 
             // apply a backoff before sending the next ping
-            sleep(calculateSleep($retryCount));
+            sleep($this->calculateSleep($retryCount));
             $this->ping(array_merge($params, ['retryCount' => $retryCount + 1]));
         }
     }
