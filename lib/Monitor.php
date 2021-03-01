@@ -89,7 +89,7 @@ class Monitor
             $response = $client->get("?$queryString");
             $responseCode = $response['code'];
 
-            if ($responseCode < 200 || $responseCode > 299) {
+            if ($responseCode !== 200) {
                 \error_log("Cronitor Telemetry Error: $responseCode", 0);
                 return false;
             }
