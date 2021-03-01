@@ -163,9 +163,11 @@ class Monitor
             'env' => isset($params['env']) ? $params['env'] : null,
         ];
 
-        return array_filter($cleanedParams, function ($v) {
+        $filteredParams = array_filter($cleanedParams, function ($v) {
             return !is_null($v);
         });
+
+        return $filteredParams;
     }
 
     private function cleanMetrics($metrics)
@@ -183,12 +185,12 @@ class Monitor
     }
     private function getPingApiUrl()
     {
-        return self::BASE_PING_API_URL . "/$apiKey/$key";
+        return self::BASE_PING_API_URL . "/$this->apiKey/$this->key";
     }
 
     private function getFallbackPingApiUrl()
     {
-        return self::BASE_FALLBACK_PING_API_URL . "/$apiKey/$key";
+        return self::BASE_FALLBACK_PING_API_URL . "/$this->apiKey/$this->key";
     }
 
     private function buildPingQuery($params)
@@ -196,8 +198,8 @@ class Monitor
         $cleanParams = $this->cleanParams($params);
         $metrics = $cleanParams['metric'];
         unset($cleanParams['metric']);
-
-        $queryParams = array_map(function ($key) {
+        
+        $queryParams = array_map(function ($key) use ($cleanParams) {
             $value = $cleanParams[$key];
             return "$key=$value";
         }, array_keys($cleanParams));
