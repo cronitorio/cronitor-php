@@ -26,7 +26,7 @@ class Client
 
     public function monitor($key)
     {
-        return new Monitor($key, $this->apiKey, $this->environment);
+        return new Monitor($key, $this->apiKey, $this->apiVersion, $this->environment);
     }
 
     public function readConfig($path = null, $output = false)
@@ -105,8 +105,9 @@ class Client
         $monitor->ping(['state' => 'run', 'series' => $series]);
 
         try {
-            $callback();
-            return $monitor->ping(['state' => 'complete', 'series' => $series]);
+            $callbackValue = $callback();
+            $monitor->ping(['state' => 'complete', 'series' => $series]);
+            return $callbackValue;
         } catch (Exception $e) {
             $message = $e->getMessage();
             $truncatedMessage = substr($message, abs(min(0, 1600 - strlen($message))));
