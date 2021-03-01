@@ -27,7 +27,7 @@ These can be supplied using the environment variables `CRONITOR_API_KEY`, `CRONI
 $apiKey = 'apiKey123';
 $apiVersion = '2020-10-01';
 $environment = 'staging';
-$cronitor = new Cronitor\CronitorClient($apiKey, $apiVersion, $environment);
+$cronitor = new Cronitor\Client($apiKey, $apiVersion, $environment);
 ```
 
 You can also use a YAML config file to manage all of your monitors (_see Create and Update Monitors section below_). The path to this file can be supplied using the enviroment variable `CRONITOR_CONFIG` or call `$cronitor->readConfig()`.
@@ -42,8 +42,9 @@ $cronitor->readConfig('./path/to/cronitor.yaml');
 The quickest way to start using this library is to wrap a block of code with the `#job` helper. It will report the start time, end time, and exit state to Cronitor. If an exception is raised, the stack trace will be included in the failure message.
 
 ```php
-$cronitor->job('warehouse-replenishmenth-report', function() {
-  new ReplenishmentReport(time())->run();
+$closureVar = time();
+$cronitor->job('warehouse-replenishmenth-report', function() use ($closureVar){
+  new ReplenishmentReport($closureVar)->run();
 });
 ```
 
