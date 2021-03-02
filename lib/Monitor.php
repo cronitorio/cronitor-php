@@ -6,7 +6,7 @@ class Monitor
 {
     private const BASE_MONITOR_API_URL = 'https://cronitor.io/api/monitors';
     private const BASE_PING_API_URL = "https://cronitor.link/p";
-    private const BASE_FALLBACK_PING_URL = "https://cronitor.link/p";
+    private const BASE_FALLBACK_PING_API_URL = "https://cronitor.io/p";
     private const PING_RETRY_THRESHOLD = 5;
 
     public $apiKey;
@@ -76,7 +76,7 @@ class Monitor
 
     public function ping($params = array())
     {
-        $retryCount = $params['retryCount'] ?: 0;
+        $retryCount = isset($params['retryCount']) ? $params['retryCount'] : 0;
 
         if (!$this->apiKey) {
             \error_log('No API key detected. Set Cronitor.api_key or initialize Monitor with an api_key:', 0);
@@ -86,16 +86,16 @@ class Monitor
         try {
             $queryString = $this->buildPingQuery($params);
             $client = $this->getPingClient($retryCount);
-            $response = $client->get("/?$queryString");
+            $response = $client->get("?$queryString");
             $responseCode = $response['code'];
 
-            if ($responseCode < 200 || $responseCode > 299) {
+            if ($responseCode !== 200) {
                 \error_log("Cronitor Telemetry Error: $responseCode", 0);
                 return false;
             }
 
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // rescue instances of StandardError i.e. Timeout::Error, SocketError, etc
             \error_log("Cronitor Telemetry Error: $e", 0);
             if ($retryCount >= self::PING_RETRY_THRESHOLD) {
@@ -103,7 +103,7 @@ class Monitor
             }
 
             // apply a backoff before sending the next ping
-            sleep(calculateSleep($retryCount));
+            sleep($this->calculateSleep($retryCount));
             $this->ping(array_merge($params, ['retryCount' => $retryCount + 1]));
         }
     }
@@ -163,9 +163,11 @@ class Monitor
             'env' => isset($params['env']) ? $params['env'] : null,
         ];
 
-        return array_filter($cleanedParams, function ($v) {
+        $filteredParams = array_filter($cleanedParams, function ($v) {
             return !is_null($v);
         });
+
+        return $filteredParams;
     }
 
     private function cleanMetrics($metrics)
@@ -183,12 +185,12 @@ class Monitor
     }
     private function getPingApiUrl()
     {
-        return self::BASE_PING_API_URL . "/$apiKey/$key";
+        return self::BASE_PING_API_URL . "/$this->apiKey/$this->key";
     }
 
     private function getFallbackPingApiUrl()
     {
-        return self::BASE_FALLBACK_PING_API_URL . "/$apiKey/$key";
+        return self::BASE_FALLBACK_PING_API_URL . "/$this->apiKey/$this->key";
     }
 
     private function buildPingQuery($params)
@@ -196,8 +198,8 @@ class Monitor
         $cleanParams = $this->cleanParams($params);
         $metrics = $cleanParams['metric'];
         unset($cleanParams['metric']);
-
-        $queryParams = array_map(function ($key) {
+        
+        $queryParams = array_map(function ($key) use ($cleanParams) {
             $value = $cleanParams[$key];
             return "$key=$value";
         }, array_keys($cleanParams));
