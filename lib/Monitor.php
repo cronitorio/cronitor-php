@@ -32,9 +32,9 @@ class Monitor
 
     public static function put($apiKey, $apiVersion, $params = [])
     {
-        $rollback = $params['rollback'] ?: false;
+        $rollback = isset($params['rollback']) ? $params['rollback'] : false;
         unset($params['rollback']);
-        $monitors = $params['monitors'] ?: [$params];
+        $monitors = isset($params['monitors']) ? $params['monitors'] : [$params];
 
         $client = self::getMonitorHttpClient($apiKey, $apiVersion);
         $response = $client->put('', [
@@ -48,7 +48,8 @@ class Monitor
                 $out = [];
                 $data = json_decode($response['content'], true);
 
-                foreach ($data['monitors'] ?: [] as &$md) {
+                $dataMonitors = isset($data['monitors']) ? $data['monitors'] : [];
+                foreach ($dataMonitors as &$md) {
                     $m = new Monitor($md['key']);
                     $m->data = $md;
                     array_push($out, $m);
@@ -66,7 +67,7 @@ class Monitor
     {
         $client = self::getMonitorHttpClient($apiKey, $apiVersion);
         $response = $client->delete("/$key", ['timeout' => 10]);
-        
+
         if ($response['code'] != 204) {
             \error_log("Error deleting monitor: $key", 0);
             return false;
@@ -114,7 +115,7 @@ class Monitor
         if ($hours) {
             $path .= "/$hours";
         }
-        
+
         $response = $this->monitorClient->get($path, ['timeout' => 5]);
         return $response['code'] >= 200 && $response['code'] <= 299;
     }
@@ -134,7 +135,7 @@ class Monitor
             \error_log('No API key detected. Initialize CronitorClient with a valid API key.', 0);
             return null;
         }
-        
+
         $response = $this->monitorClient->get('', ['timeout' => 10]);
         $this->data = json_decode($response['content']);
         return $this->data;
@@ -157,8 +158,8 @@ class Monitor
             'state' => isset($params['state']) ? $params['state'] : null,
             'message' => isset($params['message']) ? $params['message'] : null,
             'series' => isset($params['series']) ? $params['series'] : null,
-            'host' => isset($params['host']) ? $params['host'] : null, // todo: params.fetch(:host, Socket.gethostname),
-            'metric' => $params['metrics'] ? $this->cleanMetrics($params['metrics']) : null,
+            'host' => isset($params['host']) ? $params['host'] : gethostname(),
+            'metric' => isset($params['metrics']) ? $this->cleanMetrics($params['metrics']) : null,
             'stamp' => microtime(true),
             'env' => isset($params['env']) ? $params['env'] : null,
         ];
@@ -196,9 +197,9 @@ class Monitor
     private function buildPingQuery($params)
     {
         $cleanParams = $this->cleanParams($params);
-        $metrics = $cleanParams['metric'];
+        $metrics = isset($cleanParams['metric']) ? $cleanParams['metric'] : null;
         unset($cleanParams['metric']);
-        
+
         $queryParams = array_map(function ($key) use ($cleanParams) {
             $value = $cleanParams[$key];
             return "$key=$value";

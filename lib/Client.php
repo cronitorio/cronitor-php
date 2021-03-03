@@ -6,7 +6,7 @@ class Client
 {
     private const MONITOR_TYPES = ['job', 'event', 'synthetic'];
     private const BASE_CONFIG_KEYS = ['apiKey', 'apiVersion', 'environment'];
-  
+
     public $config;
     public $apiKey;
     public $apiVersion;
@@ -46,9 +46,9 @@ class Client
             }
         }
 
-        $this->apiKey = $conf['apiKey'] ?: $this->apiKey;
-        $this->apiVersion = $conf['apiVersion'] ?: $this->apiVersion;
-        $this->environment = $conf['environment'] ?: $this->environment;
+        $this->apiKey = isset($conf['apiKey']) ? $conf['apiKey'] : $this->apiKey;
+        $this->apiVersion = isset($conf['apiVersion']) ? $conf['apiVersion'] : $this->apiVersion;
+        $this->environment = isset($conf['environment']) ? $conf['environment'] : $this->environment;
 
         if (!$output) {
             return;
@@ -57,7 +57,7 @@ class Client
         $monitors = [];
         foreach (self::MONITOR_TYPES as $t) {
             $pluralType = $this->pluralizeType($t);
-            $toParse = $conf[$t] ?: $conf[$pluralType] ?: null;
+            $toParse = isset($conf[$t]) ? $conf[$t] : (isset($conf[$pluralType]) ? $conf[$pluralType] : null);
             if (!$toParse) {
                 continue;
             }
@@ -83,8 +83,8 @@ class Client
         try {
             $conf = $this->readConfig(null, true);
             $params = [
-              'monitors' =>  $conf['monitors'] ?: [],
-              'rollback' => $rollback
+                'monitors' => isset($conf['monitors']) ? $conf['monitors'] : [],
+                'rollback' => $rollback,
             ];
             $monitors = $this->monitors->put($params);
             echo count($monitors) . " monitors " . ($rollback ? 'validated' : 'synced to Cronitor');
@@ -115,7 +115,7 @@ class Client
             $monitor->ping([
                 'state' => 'fail',
                 'message' => $truncatedMessage,
-                'series' => $series
+                'series' => $series,
             ]);
             throw $e;
         }

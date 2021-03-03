@@ -15,36 +15,38 @@ class HttpClient
         $this->apiVersion = $apiVersion;
     }
 
-    public function get($path, $params = array())
+    public function get($path, $params = [])
     {
         return $this->request($path, 'GET', $params);
     }
 
-    public function delete($path, $params = array())
+    public function delete($path, $params = [])
     {
         return $this->request($path, 'DELETE', $params);
     }
 
-    public function put($path, $body = array(), $params = array())
+    public function put($path, $body = [], $params = [])
     {
         return $this->request($path, 'PUT', $params, $body);
     }
 
-    private function request($path, $httpMethod, $params = array(), $body = null)
+    private function request($path, $httpMethod, $params = [], $body = null)
     {
         $options = array(
             CURLOPT_HTTPHEADER => $this->headers(),
             CURLOPT_CUSTOMREQUEST => $httpMethod,
             CURLOPT_USERPWD => $this->apiKey . ":",
-            CURLOPT_TIMEOUT => $params['timeout'] ?: 5,
+            CURLOPT_TIMEOUT => isset($params['timeout']) ? $params['timeout'] : 5,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER => 0
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HEADER => 0,
         );
 
         $url = $this->baseUrl . $path;
+        echo $url . "\n";
         $ch = curl_init($url);
         curl_setopt_array($ch, $options);
-    
+
         if (!is_null($body)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body, JSON_UNESCAPED_SLASHES));
         }
@@ -54,7 +56,7 @@ class HttpClient
         curl_close($ch);
         return [
             'code' => $code,
-            'content' => $content
+            'content' => $content,
         ];
     }
 
