@@ -43,7 +43,6 @@ class HttpClient
         );
 
         $url = $this->baseUrl . $path;
-        echo $url . "\n";
         $ch = curl_init($url);
         curl_setopt_array($ch, $options);
 
