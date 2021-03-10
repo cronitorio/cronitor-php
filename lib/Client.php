@@ -96,7 +96,7 @@ class Client
 
     public function validateConfig()
     {
-        $this->applyConfig(true);
+        return $this->applyConfig(true);
     }
 
     public function job($key, $callback)
