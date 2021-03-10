@@ -3,3 +3,4 @@
 /coverage
 *.code-workspace
 .phpunit.result.cache
+cache

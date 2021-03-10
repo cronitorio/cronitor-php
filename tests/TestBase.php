@@ -2,9 +2,13 @@
 
 namespace Cronitor\Tests;
 
-class TestBase extends \PHPUnit_Framework_TestCase
+use AspectMock\Test as test;
+use PHPUnit\Framework\TestCase;
+
+class TestBase extends TestCase
 {
-    public function setUp()
+    protected function tearDown(): void
     {
+        test::clean();
     }
 }
