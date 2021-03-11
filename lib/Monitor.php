@@ -14,6 +14,8 @@ class Monitor
     public $key;
     public $env;
 
+    private $monitorClient;
+
     public function __construct($key, $apiKey = null, $apiVersion = null, $env = null)
     {
         $this->apiKey = $apiKey;
@@ -23,11 +25,6 @@ class Monitor
 
         $monitorApiUrl = self::BASE_MONITOR_API_URL . "/$key";
         $this->monitorClient = new HttpClient($monitorApiUrl, $this->apiKey, $this->apiVersion);
-    }
-
-    private static function getMonitorHttpClient($apiKey, $apiVersion)
-    {
-        return new HttpClient(self::BASE_MONITOR_API_URL, $apiKey, $apiVersion);
     }
 
     public static function put($apiKey, $apiVersion, $params = [])
@@ -150,6 +147,11 @@ class Monitor
     public function ok()
     {
         return $this->ping(['state' => 'ok']);
+    }
+
+    private static function getMonitorHttpClient($apiKey, $apiVersion)
+    {
+        return new HttpClient(self::BASE_MONITOR_API_URL, $apiKey, $apiVersion);
     }
 
     private function cleanParams($params)
