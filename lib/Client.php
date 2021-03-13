@@ -103,8 +103,12 @@ class Client
     {
         $configPath = $this->config ?: self::DEFAULT_CONFIG_PATH;
         $file = fopen($configPath, 'w');
-        $config = Monitor::getYaml($this->apiKey, $this->apiVersion);
-        fwrite($file, $config);
+        try {
+            $config = Monitor::getYaml($this->apiKey, $this->apiVersion);
+            fwrite($file, $config);
+        } finally {
+            fclose($file);
+        }
         return true;
     }
 
