@@ -8,6 +8,7 @@ use AspectMock\Test as test;
 final class ClientTest extends TestBase
 {
     private $client;
+    private $configPath = './cronitor.yaml';
     private $apiKey = '1234';
     private $apiVersion = '2020-01-01';
     private $environment = 'staging';
@@ -100,17 +101,25 @@ final class ClientTest extends TestBase
         $this->assertEquals($dataConfig, $returnedConfig);
     }
 
+    public function testGenerateConfig()
+    {
+        $content = 'yaml';
+        test::double('\Cronitor\Monitor', ['getYaml' => $content]);
+        $this->client->generateConfig();
+        $this->assertEquals($content, trim(file_get_contents($this->configPath)));
+    }
+
     public function testApplyConfig()
     {
-        $this->client->readConfig('tests/data/config.yml');
         test::double('\Cronitor\Monitor', ['put' => []]);
+        $this->client->readConfig('tests/data/config.yml');
         $this->assertTrue($this->client->applyConfig());
     }
 
     public function testValidateConfig()
     {
-        $this->client->readConfig('tests/data/config.yml');
         test::double('\Cronitor\Monitor', ['put' => []]);
+        $this->client->readConfig('tests/data/config.yml');
         $this->assertTrue($this->client->validateConfig());
     }
 

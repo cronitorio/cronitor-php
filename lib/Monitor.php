@@ -60,6 +60,18 @@ class Monitor
         }
     }
 
+    public static function getYaml($apiKey, $apiVersion)
+    {
+        $client = self::getMonitorHttpClient($apiKey, $apiVersion);
+        $response = $client->get('.yaml', ['timeout' => 10]);
+        $content = $response['content'];
+        if ($response['code'] == 200) {
+            return $content;
+        }
+
+        throw new \Exception("Unexpected error: $content");
+    }
+
     public static function delete($apiKey, $apiVersion, $key)
     {
         $client = self::getMonitorHttpClient($apiKey, $apiVersion);

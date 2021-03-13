@@ -6,7 +6,7 @@ class Client
 {
     private const MONITOR_TYPES = ['job', 'event', 'synthetic'];
     private const BASE_CONFIG_KEYS = ['apiKey', 'apiVersion', 'environment'];
-
+    private const DEFAULT_CONFIG_PATH = './cronitor.yaml';
     public $config;
     public $apiKey;
     public $apiVersion;
@@ -97,6 +97,15 @@ class Client
     public function validateConfig()
     {
         return $this->applyConfig(true);
+    }
+
+    public function generateConfig()
+    {
+        $configPath = $this->config ?: self::DEFAULT_CONFIG_PATH;
+        $file = fopen($configPath, 'w');
+        $config = Monitor::getYaml($this->apiKey, $this->apiVersion);
+        fwrite($file, $config);
+        return true;
     }
 
     public function job($key, $callback)
