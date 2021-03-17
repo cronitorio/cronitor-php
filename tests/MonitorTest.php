@@ -53,6 +53,31 @@ final class MonitorTest extends TestBase
         $this->assertEquals($mockResponse, $result);
     }
 
+    public function testGetYaml()
+    {
+        $content = "yaml";
+        $mockResponse = [
+            'code' => 200,
+            'content' => $content
+        ];
+        $mockHttpClient = test::double('Cronitor\HttpClient', ['get' => $mockResponse]);
+
+        $result = \Cronitor\Monitor::getYaml($this->apiKey, $this->apiVersion);
+        $this->assertEquals($content, $result);
+    }
+
+    public function testGetYamlFailure()
+    {
+        $content = "yaml";
+        $mockResponse = [
+            'code' => 500,
+            'content' => $content
+        ];
+        $mockHttpClient = test::double('Cronitor\HttpClient', ['get' => $mockResponse]);
+        $this->expectException(\Exception::class);
+        $result = \Cronitor\Monitor::getYaml($this->apiKey, $this->apiVersion);
+    }
+
     public function testPing()
     {
         $mockResponse = [

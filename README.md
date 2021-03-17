@@ -3,6 +3,7 @@
 [Cronitor](https://cronitor.io/) provides dead simple monitoring for cron jobs, daemons, data pipelines, queue workers, and anything else that can send or receive an HTTP request. The Cronitor Ruby library provides convenient access to the Cronitor API from applications written in Ruby.
 
 ## Documentation
+
 See our [API docs](https://cronitor.io/docs/api) for a detailed reference information about the APIs this library uses for configuring monitors and sending telemetry pings.
 
 ## Installation
@@ -35,7 +36,6 @@ You can also use a YAML config file to manage all of your monitors (_see Create 
 ```php
 $cronitor->readConfig('./path/to/cronitor.yaml');
 ```
-
 
 ### Monitor Any Block
 
@@ -85,7 +85,6 @@ $monitor->delete() # destroy the monitor
 You can create monitors programatically.
 For details on all of the attributes that can be set see the [Monitor API](https://cronitor.io/docs/monitor-api) documentation.
 
-
 ```php
 $cronitor->monitors->put([
   [
@@ -124,61 +123,61 @@ $cronitor->applyConfig();
 # send config file's monitors to Cronitor to validate correctness.
 # monitors will not be saved.
 $cronitor->validateConfig();
-```
 
+# save config to local YAML file (defaults to cronitor.yaml)
+$cronitor->generateConfig();
+```
 
 The `cronitor.yaml` file accepts the following attributes:
 
 ```yaml
-api_key: 'optionally read Cronitor api_key from here'
-api_version: 'optionally read Cronitor api_version from here'
-environment: 'optionally set an environment for telemetry pings'
+api_key: "optionally read Cronitor api_key from here"
+api_version: "optionally read Cronitor api_version from here"
+environment: "optionally set an environment for telemetry pings"
 
 # configure all of your monitors with type "job"
 # you may omit the type attribute and the key
 # of each object will be set as the monitor key
 jobs:
-    nightly-database-backup:
-        schedule: 0 0 * * *
-        notify:
-            - devops-alert-pagerduty
-        assertions:
-            - metric.duration < 5 minutes
+  nightly-database-backup:
+    schedule: 0 0 * * *
+    notify:
+      - devops-alert-pagerduty
+    assertions:
+      - metric.duration < 5 minutes
 
-    send-welcome-email:
-        schedule: every 10 minutes
-        assertions:
-            - metric.count > 0
-            - metric.duration < 30 seconds
+  send-welcome-email:
+    schedule: every 10 minutes
+    assertions:
+      - metric.count > 0
+      - metric.duration < 30 seconds
 
 # configure all of your monitors with type "synthetic"
 synthetics:
-    cronitor-homepage:
-        request:
-            url: https://cronitor.io
-            regions:
-                - us-east-1
-                - eu-central-1
-                - ap-northeast-1
-        assertions:
-            - response.code = 200
-            - response.time < 2s
+  cronitor-homepage:
+    request:
+      url: https://cronitor.io
+      regions:
+        - us-east-1
+        - eu-central-1
+        - ap-northeast-1
+    assertions:
+      - response.code = 200
+      - response.time < 2s
 
-    cronitor-telemetry-api:
-        request:
-            url: https://cronitor.link/ping
-        assertions:
-            - response.body contains ok
-            - response.time < .25s
+  cronitor-telemetry-api:
+    request:
+      url: https://cronitor.link/ping
+    assertions:
+      - response.body contains ok
+      - response.time < .25s
 
 events:
-    production-deploy:
-        notify:
-            alerts: ['deploys-slack']
-            events: true # send alert when the event occurs
-
+  production-deploy:
+    notify:
+      alerts: ["deploys-slack"]
+      events: true # send alert when the event occurs
 ```
-
 
 ## Contributing
 
@@ -190,4 +189,4 @@ Fork, then clone the repo:
 
     git clone git@github.com:your-username/cronitor-php.git
 
-Push to your fork and [submit a pull request]( https://github.com/cronitorio/cronitor-php/compare/)
+Push to your fork and [submit a pull request](https://github.com/cronitorio/cronitor-php/compare/)
