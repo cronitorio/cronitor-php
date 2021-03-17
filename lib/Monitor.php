@@ -63,7 +63,8 @@ class Monitor
     public static function getYaml($apiKey, $apiVersion)
     {
         $client = self::getMonitorHttpClient($apiKey, $apiVersion);
-        $response = $client->get('.yaml', ['timeout' => 25]);
+        $params = ['timeout' => 25, 'headers' => ['Accept' => 'application/yaml']];
+        $response = $client->get('.yaml', $params);
         $content = $response['content'];
         if ($response['code'] == 200) {
             return $content;
