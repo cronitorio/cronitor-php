@@ -32,8 +32,9 @@ class HttpClient
 
     private function request($path, $httpMethod, $params = [], $body = null)
     {
+        $headers = $this->buildHeaders(isset($params['headers']) ? $params['headers'] : []);
         $options = array(
-            CURLOPT_HTTPHEADER => $this->headers(),
+            CURLOPT_HTTPHEADER => $headers,
             CURLOPT_CUSTOMREQUEST => $httpMethod,
             CURLOPT_USERPWD => $this->apiKey . ":",
             CURLOPT_TIMEOUT => isset($params['timeout']) ? $params['timeout'] : 5,
@@ -59,13 +60,19 @@ class HttpClient
         ];
     }
 
-    private function headers()
+    private function buildHeaders($headers = [])
     {
-        return [
-            'Content-Type: application/json',
-            'Accept: application/json',
-            'User-Agent: cronitor-php',
-            "Cronitor-Version: $this->apiVersion",
+        $defaultHeaders = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            "User-Agent" => 'cronitor-php',
+            "Cronitor-Version" => $this->apiVersion,
         ];
+        $mergedHeaders = array_merge($defaultHeaders, $headers);
+
+        return array_map(function ($key) use ($mergedHeaders) {
+            $value = $mergedHeaders[$key];
+            return "$key: $value";
+        }, array_keys($mergedHeaders));
     }
 }
