@@ -176,7 +176,7 @@ class Monitor
             'host' => isset($params['host']) ? $params['host'] : gethostname(),
             'metric' => isset($params['metrics']) ? $this->cleanMetrics($params['metrics']) : null,
             'stamp' => microtime(true),
-            'env' => isset($params['env']) ? $params['env'] : null,
+            'env' => isset($params['env']) ? $params['env'] : $this->env,
         ];
 
         $filteredParams = array_filter($cleanedParams, function ($v) {
