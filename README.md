@@ -1,6 +1,6 @@
 # Cronitor PHP Library
 
-[Cronitor](https://cronitor.io/) provides dead simple monitoring for cron jobs, daemons, data pipelines, queue workers, and anything else that can send or receive an HTTP request. The Cronitor Ruby library provides convenient access to the Cronitor API from applications written in Ruby.
+[Cronitor](https://cronitor.io/) provides dead simple monitoring for cron jobs, daemons, data pipelines, queue workers, and anything else that can send or receive an HTTP request. The Cronitor PHP library provides convenient access to the Cronitor API from applications written in PHP.
 
 ## Documentation
 
