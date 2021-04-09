@@ -2,6 +2,8 @@
 
 namespace Cronitor;
 
+use Exception;
+
 class Client
 {
     private const MONITOR_TYPES = ['job', 'event', 'synthetic'];
@@ -62,7 +64,6 @@ class Client
                 continue;
             }
 
-            array_keys($toParse) !== range(0, count($toParse) - 1);
             if (array_keys($toParse) === range(0, count($toParse) - 1)) {
                 throw new ConfigurationException('An associative array with keys corresponding to monitor keys is expected.');
             }
@@ -112,6 +113,9 @@ class Client
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
     public function job($key, $callback)
     {
         $monitor = $this->monitor($key);

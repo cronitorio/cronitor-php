@@ -188,7 +188,7 @@ class Monitor
 
     private function cleanMetrics($metrics)
     {
-        return array_map(function ($key) {
+        return array_map(function ($key) use ($metrics) {
             $value = $metrics[$key];
             return "$key:$value";
         }, array_keys($metrics));
