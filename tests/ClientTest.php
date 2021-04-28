@@ -131,4 +131,15 @@ final class ClientTest extends TestBase
         $jobResult = $this->client->job('1234', $callback);
         $this->assertEquals('success', $jobResult);
     }
+
+    public function testJobException()
+    {
+        $this->expectExceptionMessage('This job Exception');
+        $this->expectException(\Exception::class);
+        $callback = function () {
+            throw new \Exception('This job Exception');
+        };
+
+        $jobResult = $this->client->job('1234', $callback);
+    }
 }

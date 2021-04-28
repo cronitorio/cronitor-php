@@ -6,6 +6,7 @@ use AspectMock\Test as test;
 
 final class MonitorTest extends TestBase
 {
+    private $monitor;
     private $key = 'monitor1234';
     private $apiKey = 'api1234';
     private $apiVersion = '2020-01-01';
@@ -145,5 +146,22 @@ final class MonitorTest extends TestBase
 
         $result = $this->monitor->ok();
         $this->assertTrue($result);
+    }
+
+    public function testCleanMetrics()
+    {
+        $metrics = [
+            'key1' => 'value1',
+            'key2' => 'value2',
+            'key3' => 'value3'
+        ];
+
+        $method = new \ReflectionMethod('\Cronitor\Monitor', 'cleanMetrics');
+        $method->setAccessible(true);
+
+        $cleanMetricsResult = $method->invokeArgs($this->monitor, [$metrics]);
+
+        $this->assertSame('key1:value1', $cleanMetricsResult[0]);
+        $this->assertArrayNotHasKey('key1', $cleanMetricsResult);
     }
 }

@@ -4,3 +4,4 @@
 *.code-workspace
 .phpunit.result.cache
 cache
+composer.lock

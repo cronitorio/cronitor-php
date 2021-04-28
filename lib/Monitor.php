@@ -4,10 +4,10 @@ namespace Cronitor;
 
 class Monitor
 {
-    private const BASE_MONITOR_API_URL = 'https://cronitor.io/api/monitors';
-    private const BASE_PING_API_URL = "https://cronitor.link/p";
-    private const BASE_FALLBACK_PING_API_URL = "https://cronitor.io/p";
-    private const PING_RETRY_THRESHOLD = 5;
+    const BASE_MONITOR_API_URL = 'https://cronitor.io/api/monitors';
+    const BASE_PING_API_URL = "https://cronitor.link/p";
+    const BASE_FALLBACK_PING_API_URL = "https://cronitor.io/p";
+    const PING_RETRY_THRESHOLD = 5;
 
     public $apiKey;
     public $apiVersion;
@@ -188,7 +188,7 @@ class Monitor
 
     private function cleanMetrics($metrics)
     {
-        return array_map(function ($key) {
+        return array_map(function ($key) use ($metrics) {
             $value = $metrics[$key];
             return "$key:$value";
         }, array_keys($metrics));
