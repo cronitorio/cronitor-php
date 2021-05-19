@@ -1,10 +1,15 @@
 # Cronitor PHP Library
 
-[Cronitor](https://cronitor.io/) provides dead simple monitoring for cron jobs, daemons, data pipelines, queue workers, and anything else that can send or receive an HTTP request. The Cronitor PHP library provides convenient access to the Cronitor API from applications written in PHP.
+[Cronitor](https://cronitor.io/) provides dead simple monitoring for cron jobs, daemons, queue workers, websites, APIs, and anything else that can send or receive an HTTP request. The Cronitor PHP library provides convenient access to the Cronitor API from applications written in PHP. See our [API docs](https://cronitor.io/docs/api) for detailed references on configuring monitors and sending telemetry pings.
 
-## Documentation
+In this guide:
 
-See our [API docs](https://cronitor.io/docs/api) for a detailed reference information about the APIs this library uses for configuring monitors and sending telemetry pings.
+- [Installation](##Installation)
+- [Monitoring Background Jobs](##monitoring-background-jobs)
+- [Sending Telemetry Events](##sending-telemetry-events)
+- [Configuring Monitors](##configuring-monitors)
+- [Package Configuration & Env Vars](##package-configuration)
+- [Command Line Usage](##command-line-usage)
 
 ## Installation
 
@@ -18,42 +23,28 @@ To use manually, you can include the `init.php` file from source.
 require_once('/path/to/cronitor-php/init.php');
 ```
 
-## Usage
+### Monitoring Background Jobs
 
-The package needs to be configured with your account's `API key`, which is available on the [account settings](https://cronitor.io/settings) page. You can also optionally specify an `API Version` (default: account default) and `Environment` (default: account default).
+The `$cronitor->job` function will send telemetry events before calling your function and after it exits. If your function raises an exception a `fail` event will be sent (and the exception re-raised).
 
-These can be supplied using the environment variables `CRONITOR_API_KEY`, `CRONITOR_API_VERSION`, `CRONITOR_ENVIRONMENT` or set directly on the cronitor object.
-
-```php
-$apiKey = 'apiKey123';
-$apiVersion = '2020-10-01';
-$environment = 'staging';
-$cronitor = new Cronitor\Client($apiKey, $apiVersion, $environment);
-```
-
-You can also use a YAML config file to manage all of your monitors (_see Create and Update Monitors section below_). The path to this file can be supplied using the enviroment variable `CRONITOR_CONFIG` or call `$cronitor->readConfig()`.
 
 ```php
-$cronitor->readConfig('./path/to/cronitor.yaml');
-```
+$cronitor = new Cronitor\Client('api_key_123');
 
-### Monitor Any Block
-
-The quickest way to start using this library is to wrap a block of code with the `#job` helper. It will report the start time, end time, and exit state to Cronitor. If an exception is raised, the stack trace will be included in the failure message.
-
-```php
 $closureVar = time();
 $cronitor->job('warehouse-replenishmenth-report', function() use ($closureVar){
   new ReplenishmentReport($closureVar)->run();
 });
 ```
 
-### Sending Telemetry Events
+## Sending Telemetry Events
 
-If you want finer control over when/how [telemetry pings](https://cronitor.io/docs/telemetry-api) are sent,
-you can instantiate a monitor and call `#ping`.
+If you want to send a heartbeat events, or want finer control over when/how [telemetry events](https://cronitor.io/docs/telemetry-api) are sent for your jobs, you can create a `Monitor` instance and call the `.ping` method.
+
 
 ```php
+$cronitor = new Cronitor\Client('api_key_123');
+
 $monitor = $cronitor->monitor('heartbeat-monitor');
 
 $monitor->ping(); # a basic heartbeat event
@@ -67,51 +58,10 @@ $monitor->ping(['state' => 'run', 'env' => 'staging']); # a job/process has star
 $monitor->ping(['state' => 'complete', 'metrics' => ['count' => 1000, 'error_count' => 17]);
 ```
 
-### Pause, Reset, Delete
+## Configuring Monitors
 
-```php
-require 'cronitor'
-
-$monitor = $cronitor->monitor('heartbeat-monitor');
-
-$monitor->pause(24) # pause alerting for 24 hours
-$monitor->unpause() # alias for .pause(0)
-$monitor->ok() # manually reset to a passing state alias for $monitor->ping({state: ok})
-$monitor->delete() # destroy the monitor
-```
-
-## Create and Update Monitors
-
-You can create monitors programatically.
-For details on all of the attributes that can be set see the [Monitor API](https://cronitor.io/docs/monitor-api) documentation.
-
-```php
-$cronitor->monitors->put([
-  [
-    'type' => 'job',
-    'key' => 'send-customer-invoices',
-    'schedule' => '0 0 * * *',
-    'assertions' => [
-        'metric.duration < 5 min'
-    ],
-    'notify' => ['devops-alerts-slack']
-  ],
-  [
-    'type' => 'synthetic',
-    'key' => 'Orders Api Uptime',
-    'schedule' => 'every 45 seconds',
-    'assertions' => [
-        'response.code = 200',
-        'response.time < 1.5s',
-        'response.json "open_orders" < 2000'
-    ]
-  ]
-])
-```
-
-You can also manage all of your monitors via a YAML config file.
-This can be version controlled and synced to Cronitor as part of
-a deployment process or system update.
+You can configure all of your monitors using a single YAML file. This can be version controlled and synced to Cronitor as part of
+a deployment or build process. For details on all of the attributes that can be set, see the [Monitor API](https://cronitor.io/docs/monitor-api) documentation.
 
 ```php
 # read config file and set credentials (if included).
@@ -128,16 +78,9 @@ $cronitor->validateConfig();
 $cronitor->generateConfig();
 ```
 
-The `cronitor.yaml` file accepts the following attributes:
+The `cronitor.yaml` file includes three top level keys `jobs`, `checks`, `events`. You can configure monitors under each key by declaring a monitor `key` and defining [Monitor attributes](https://cronitor.io/docs/monitor-api#attributes)
 
 ```yaml
-api_key: "optionally read Cronitor api_key from here"
-api_version: "optionally read Cronitor api_version from here"
-environment: "optionally set an environment for telemetry pings"
-
-# configure all of your monitors with type "job"
-# you may omit the type attribute and the key
-# of each object will be set as the monitor key
 jobs:
   nightly-database-backup:
     schedule: 0 0 * * *
@@ -177,6 +120,56 @@ events:
     notify:
       alerts: ["deploys-slack"]
       events: true # send alert when the event occurs
+```
+
+You can also create and update monitors by calling `$cronitor->monitors->put`. For details on all of the attributes that can be set see the Monitor API [documentation)(https://cronitor.io/docs/monitor-api#attributes).
+
+```php
+$cronitor->monitors->put([
+  [
+    'type' => 'job',
+    'key' => 'send-customer-invoices',
+    'schedule' => '0 0 * * *',
+    'assertions' => [
+        'metric.duration < 5 min'
+    ],
+    'notify' => ['devops-alerts-slack']
+  ],
+  [
+    'type' => 'synthetic',
+    'key' => 'Orders Api Uptime',
+    'schedule' => 'every 45 seconds',
+    'assertions' => [
+        'response.code = 200',
+        'response.time < 1.5s',
+        'response.json "open_orders" < 2000'
+    ]
+  ]
+])
+```
+
+### Pause, Reset, Delete
+
+```php
+require 'cronitor'
+
+$monitor = $cronitor->monitor('heartbeat-monitor');
+
+$monitor->pause(24) # pause alerting for 24 hours
+$monitor->unpause() # alias for ->pause(0)
+$monitor->ok() # manually reset to a passing state alias for $monitor->ping({state: ok})
+$monitor->delete() # destroy the monitor
+```
+
+## Package Configuration
+
+The package needs to be configured with your account's `API key`, which is available on the [account settings](https://cronitor.io/settings) page. You can also optionally specify an `api_version` and an `environment`. If not provided, your account default is used. These can also be supplied using the environment variables `CRONITOR_API_KEY`, `CRONITOR_API_VERSION`, `CRONITOR_ENVIRONMENT`.
+
+```php
+$apiKey = 'apiKey123';
+$apiVersion = '2020-10-01';
+$environment = 'staging';
+$cronitor = new Cronitor\Client($apiKey, $apiVersion, $environment);
 ```
 
 ## Contributing
