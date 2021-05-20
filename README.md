@@ -81,7 +81,7 @@ $cronitor->validateConfig();
 $cronitor->generateConfig();
 ```
 
-The `cronitor.yaml` file includes three top level keys `jobs`, `checks`, `events`. You can configure monitors under each key by declaring a monitor `key` and defining [Monitor attributes](https://cronitor.io/docs/monitor-api#attributes)
+The `cronitor.yaml` file includes three top level keys `jobs`, `checks`, `heartbeats`. You can configure monitors under each key by declaring a monitor `key` and defining [Monitor attributes](https://cronitor.io/docs/monitor-api#attributes)
 
 ```yaml
 jobs:
@@ -99,7 +99,7 @@ jobs:
       - metric.duration < 30 seconds
 
 # configure all of your monitors with type "synthetic"
-synthetics:
+checks:
   cronitor-homepage:
     request:
       url: https://cronitor.io
@@ -118,7 +118,7 @@ synthetics:
       - response.body contains ok
       - response.time < .25s
 
-events:
+heartbeats:
   production-deploy:
     notify:
       alerts: ["deploys-slack"]
@@ -139,9 +139,12 @@ $cronitor->monitors->put([
     'notify' => ['devops-alerts-slack']
   ],
   [
-    'type' => 'synthetic',
-    'key' => 'Orders Api Uptime',
+    'type' => 'check',
+    'key' => 'Cronitor Homepage',
     'schedule' => 'every 45 seconds',
+    'request' => [
+        'url' => 'https://cronitor.io'
+    ]
     'assertions' => [
         'response.code = 200',
         'response.time < 1.5s',
