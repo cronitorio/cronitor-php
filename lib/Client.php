@@ -6,7 +6,7 @@ use Exception;
 
 class Client
 {
-    const MONITOR_TYPES = ['job', 'event', 'synthetic'];
+    const MONITOR_TYPES = ['job', 'heartbeat', 'check'];
     const BASE_CONFIG_KEYS = ['apiKey', 'apiVersion', 'environment'];
     const DEFAULT_CONFIG_PATH = './cronitor.yaml';
     public $config;
