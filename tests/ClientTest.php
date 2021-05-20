@@ -47,7 +47,7 @@ final class ClientTest extends TestBase
                     'schedule' => 'every 10 minutes'
                 ]
             ],
-            'synthetics' => [
+            'checks' => [
                 'cronitor-homepage' => [
                     'request' => [
                         'url' => 'https://cronitor.io'
@@ -55,7 +55,7 @@ final class ClientTest extends TestBase
                     'assertions' => ['response.time < 2s']
                 ]
             ],
-            'events' => [
+            'heartbeats' => [
                 'production-deploy' => [
                     'notify' => [
                         'alerts' => ['default'],
@@ -83,7 +83,7 @@ final class ClientTest extends TestBase
                 ],
                 [
                     'key' => 'production-deploy',
-                    'type' => 'event',
+                    'type' => 'heartbeat',
                     "notify" => [
                         "alerts" => ["default"],
                         "events" => ["complete" => true]
@@ -91,7 +91,7 @@ final class ClientTest extends TestBase
                 ],
                 [
                     'key' => 'cronitor-homepage',
-                    'type' => 'synthetic',
+                    'type' => 'check',
                     'request' => ['url' => 'https://cronitor.io'],
                     'assertions' => ['response.time < 2s']
                 ]
