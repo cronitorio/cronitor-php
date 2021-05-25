@@ -98,7 +98,6 @@ jobs:
       - metric.count > 0
       - metric.duration < 30 seconds
 
-# configure all of your monitors with type "synthetic"
 checks:
   cronitor-homepage:
     request:
