@@ -54,9 +54,9 @@ $monitor->ping(); # a basic heartbeat event
 # optional params can be passed as kwargs
 # complete list - https://cronitor.io/docs/telemetry-api#parameters
 
-$monitor->ping(['state' => 'run', 'env' => 'staging']); # a job/process has started in a staging environment
+$monitor->ping(['state' => 'run']); # a job/process has started
 
-# a job/process has completed - include metrics for cronitor to record
+# a job/process has completed (include metrics for Cronitor to record)
 $monitor->ping(['state' => 'complete', 'metrics' => ['count' => 1000, 'error_count' => 17]);
 ```
 
