@@ -122,7 +122,7 @@ class Monitor
     public function pause($hours = null)
     {
         $path = '/pause';
-        if ($hours) {
+        if (isset($hours)) {
             $path .= "/$hours";
         }
 
