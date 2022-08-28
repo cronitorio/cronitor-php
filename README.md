@@ -34,8 +34,8 @@ The `$cronitor->job` function will send telemetry events before calling your fun
 $cronitor = new Cronitor\Client('api_key_123');
 
 $closureVar = time();
-$cronitor->job('warehouse-replenishmenth-report', function() use ($closureVar){
-  new ReplenishmentReport($closureVar)->run();
+$cronitor->job('weekly-report-task', function() use ($closureVar){
+  new WeeklyReportTask($closureVar)->run();
 });
 ```
 
