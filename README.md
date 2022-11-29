@@ -57,7 +57,7 @@ $monitor->ping(); # a basic heartbeat event
 $monitor->ping(['state' => 'run']); # a job/process has started
 
 # a job/process has completed (include metrics for Cronitor to record)
-$monitor->ping(['state' => 'complete', 'metrics' => ['count' => 1000, 'error_count' => 17]);
+$monitor->ping(['state' => 'complete', 'metrics' => ['count' => 1000, 'error_count' => 17]]);
 ```
 
 ## Configuring Monitors
