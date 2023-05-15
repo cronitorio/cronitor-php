@@ -13,6 +13,7 @@ class Client
     public $apiKey;
     public $apiVersion;
     public $monitors;
+    public $environment;
 
     public function __construct($apiKey, $apiVersion = null, $environment = null)
     {
