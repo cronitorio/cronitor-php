@@ -53,10 +53,17 @@ class HttpClient
 
         $content = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($content === false) {
+            $error = curl_error($ch);
+        }
+
         curl_close($ch);
+
         return [
             'code' => $code,
             'content' => $content,
+            'error' => isset($error) ? $error : null,
         ];
     }
 
