@@ -58,6 +58,15 @@ $monitor->ping(['state' => 'run']); # a job/process has started
 
 # a job/process has completed (include metrics for Cronitor to record)
 $monitor->ping(['state' => 'complete', 'metrics' => ['count' => 1000, 'error_count' => 17]]);
+
+# custom metric names are also accepted alongside built-ins (count, error_count, duration)
+# each key is sent as metric=name:value, e.g. metric=queue_depth:42
+$monitor->ping(['state' => 'complete', 'metrics' => [
+  'count' => 1000,
+  'error_count' => 17,
+  'queue_depth' => 42,
+  'quality_score' => 0.97
+]]);
 ```
 
 ## Configuring Monitors
