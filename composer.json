@@ -17,11 +17,44 @@
     "symfony/yaml": "^5.4.54|^6.4.45|^7.4.18|^8.1.6"
   },
   "require-dev": {
-    "phpunit/phpunit": "^8.5.52",
+    "phpunit/phpunit": "^9.6",
     "friendsofphp/php-cs-fixer": "^2.18",
     "ext-curl": "*",
-    "codeception/aspect-mock": "^3.1"
+    "codeception/aspect-mock": "5.0.0-dev"
   },
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "codeception/aspect-mock",
+        "version": "5.0.0-dev",
+        "description": "AspectMock commit 5a078a6 (unreleased 5.0-dev). That commit's own composer.json requires unreleased goaop 4; goaop/framework 3.1.1 already exposes the API this commit calls and runs on PHP 8.2-8.5.",
+        "license": "MIT",
+        "source": {
+          "type": "git",
+          "url": "https://github.com/Codeception/AspectMock.git",
+          "reference": "5a078a62103ccd87c8cf5e2b7bbc9434f8140025"
+        },
+        "dist": {
+          "type": "zip",
+          "url": "https://codeload.github.com/Codeception/AspectMock/zip/5a078a62103ccd87c8cf5e2b7bbc9434f8140025",
+          "reference": "5a078a62103ccd87c8cf5e2b7bbc9434f8140025"
+        },
+        "require": {
+          "php": "^8.2",
+          "goaop/framework": "^3.1.1",
+          "goaop/parser-reflection": "^3.1.0",
+          "phpunit/phpunit": "^9.5",
+          "symfony/finder": "^4.4 || ^5.4 || ^6.0"
+        },
+        "autoload": {
+          "psr-0": {
+            "AspectMock": "src/"
+          }
+        }
+      }
+    }
+  ],
   "autoload": {
     "psr-4": {
       "Cronitor\\": "lib/"
