@@ -292,11 +292,14 @@ class Ingest
             return '<array>';
         }
         if ($value instanceof \stdClass) {
-            $out = new \stdClass();
-            foreach (get_object_vars($value) as $k => $v) {
-                $out->$k = self::jsonSafe($v, $depth + 1);
+            $out = [];
+            foreach ((array) $value as $k => $v) {
+                if (is_string($k) && isset($k[0]) && $k[0] === "\0") {
+                    continue;
+                }
+                $out[$k] = self::jsonSafe($v, $depth + 1);
             }
-            return $out;
+            return (object) $out;
         }
         if (is_object($value)) {
             if ($value instanceof \JsonSerializable) {

@@ -234,6 +234,7 @@ class Transport
             CURLOPT_POSTFIELDS => $data,
             CURLOPT_HTTPHEADER => $formattedHeaders,
             CURLOPT_TIMEOUT_MS => max(1, (int) ceil($timeout * 1000)),
+            CURLOPT_NOSIGNAL => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HEADER => false,

@@ -670,4 +670,48 @@ PHP;
         $firstFormatted = $this->decodeEnvelope($recorded[0]['body'])['payload']['message']['formatted'];
         $this->assertSame('x' . str_repeat("\xF0\x9F\x98\x80", 999), $firstFormatted);
     }
+
+    public function testJsonSafeHandlesNulPrefixedObjectKeysWithoutDroppingEvents()
+    {
+        list($client, $recorded) = $this->makeRecorderClient();
+
+        $obj = new class {
+            private $secret = 'private';
+            protected $internal = 'protected';
+            public $bad = NAN;
+            public $ok = 'visible';
+        };
+        $extraFromObj = (array) $obj;
+        $extraSnapshot = $extraFromObj;
+
+        $firstId = $client->captureMessage('cast object with nan', [
+            'extra' => $extraFromObj,
+        ]);
+        $this->assertIsString($firstId);
+        $this->assertSame(array_keys($extraSnapshot), array_keys($extraFromObj));
+
+        $secondId = $client->captureMessage('nul tag with invalid utf8', [
+            'tags' => ["\0hidden" => 'skip', '0' => 'zero'],
+            'extra' => ['raw' => "\xB1\x31"],
+        ]);
+        $this->assertIsString($secondId);
+
+        $this->assertTrue($client->flush());
+        $this->assertCount(2, $recorded);
+
+        $firstRaw = $this->decodeEnvelope($recorded[0]['body'])['payloadRaw'];
+        $firstPayload = json_decode($firstRaw, false);
+        $this->assertIsObject($firstPayload);
+        $this->assertIsObject($firstPayload->extra);
+        $this->assertSame('NAN', $firstPayload->extra->bad);
+        $this->assertSame('visible', $firstPayload->extra->ok);
+
+        $secondRaw = $this->decodeEnvelope($recorded[1]['body'])['payloadRaw'];
+        $secondPayload = json_decode($secondRaw, false);
+        $this->assertIsObject($secondPayload);
+        $this->assertIsObject($secondPayload->tags);
+        $this->assertSame('zero', $secondPayload->tags->{'0'});
+        $this->assertIsObject($secondPayload->extra);
+        $this->assertIsString($secondPayload->extra->raw);
+    }
 }
