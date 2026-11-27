@@ -3,11 +3,13 @@
 namespace Cronitor\Tests;
 
 use AspectMock\Test as test;
+use Cronitor\Capture;
 use Cronitor\Client;
 use Cronitor\ErrorApp;
 use Cronitor\ErrorAppNotFound;
 use Cronitor\ErrorGroup;
 use Cronitor\ErrorGroupNotFound;
+use Cronitor\HttpClient;
 use Cronitor\Ingest;
 use Cronitor\Monitor;
 use Cronitor\Transport;
@@ -502,5 +504,170 @@ final class ErrorTrackingTest extends TestBase
         ]);
         $this->assertInstanceOf(Monitor::class, $monitor);
         $this->assertSame('errors', $capturedBody['monitors'][0]['type']);
+    }
+
+    public function testBodylessPostSendsContentLengthZero()
+    {
+        $serverCode = <<<'PHP'
+$server = stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
+if (!$server) {
+    exit(1);
+}
+echo stream_socket_get_name($server, false) . "\n";
+flush();
+$conn = @stream_socket_accept($server, 5);
+if ($conn) {
+    stream_set_timeout($conn, 2);
+    $raw = '';
+    while (!feof($conn) && strpos($raw, "\r\n\r\n") === false) {
+        $chunk = fread($conn, 4096);
+        if ($chunk === '' || $chunk === false) {
+            break;
+        }
+        $raw .= $chunk;
+    }
+    fwrite($conn, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{}");
+    fclose($conn);
+    echo $raw;
+}
+fclose($server);
+PHP;
+
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $proc = proc_open([PHP_BINARY, '-r', $serverCode], $descriptors, $pipes);
+        $this->assertIsResource($proc);
+        fclose($pipes[0]);
+
+        try {
+            $addr = trim((string) fgets($pipes[1]));
+            $this->assertNotSame('', $addr);
+
+            $http = new HttpClient('http://' . $addr, 'api_key', '2020-10-01');
+            $res = $http->post('/rotate-key', null);
+            $this->assertSame(200, $res['code']);
+
+            $rawRequest = stream_get_contents($pipes[1]);
+            $this->assertMatchesRegularExpression('/^POST \/rotate-key HTTP\/1\.\d/m', $rawRequest);
+            $this->assertMatchesRegularExpression('/^Content-Length:\s*0\r?$/mi', $rawRequest);
+        } finally {
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+            proc_close($proc);
+        }
+    }
+
+    public function testTagsAndExtraAlwaysEncodeAsJsonObjects()
+    {
+        list($client, $recorded) = $this->makeRecorderClient();
+
+        $tagsInput = ['0' => 'zero', '1' => 'one'];
+        $extraInput = ['a', 'b'];
+
+        $client->captureMessage('numeric keys', [
+            'tags' => $tagsInput,
+            'extra' => $extraInput,
+        ]);
+        $client->captureMessage('empty maps');
+        $this->assertTrue($client->flush());
+        $this->assertCount(2, $recorded);
+
+        $this->assertSame(['0' => 'zero', '1' => 'one'], $tagsInput);
+        $this->assertSame(['a', 'b'], $extraInput);
+
+        $firstRaw = $this->decodeEnvelope($recorded[0]['body'])['payloadRaw'];
+        $firstObj = json_decode($firstRaw, false);
+        $this->assertIsObject($firstObj->tags);
+        $this->assertSame('zero', $firstObj->tags->{'0'});
+        $this->assertSame('one', $firstObj->tags->{'1'});
+        $this->assertIsObject($firstObj->extra);
+        $this->assertSame('a', $firstObj->extra->{'0'});
+        $this->assertSame('b', $firstObj->extra->{'1'});
+        $this->assertStringContainsString('"tags":{"0":"zero","1":"one"}', $firstRaw);
+        $this->assertStringContainsString('"extra":{"0":"a","1":"b"}', $firstRaw);
+
+        $secondRaw = $this->decodeEnvelope($recorded[1]['body'])['payloadRaw'];
+        $secondObj = json_decode($secondRaw, false);
+        $this->assertIsObject($secondObj->tags);
+        $this->assertIsObject($secondObj->extra);
+        $this->assertStringContainsString('"tags":{}', $secondRaw);
+        $this->assertStringContainsString('"extra":{}', $secondRaw);
+    }
+
+    public function testFlushHonorsSubSecondTimeoutAgainstStalledSocket()
+    {
+        $server = stream_socket_server('tcp://127.0.0.1:0', $errno, $errstr);
+        $this->assertNotFalse($server, $errstr);
+
+        try {
+            $addr = stream_socket_get_name($server, false);
+            $client = new Client('api_key', [
+                'dsn' => 'http://ing_stalled@' . $addr . '/1',
+            ]);
+
+            $this->assertNotNull($client->captureMessage('stalled endpoint'));
+            $start = microtime(true);
+            $client->flush(0.1);
+            $elapsed = microtime(true) - $start;
+
+            $this->assertLessThan(0.5, $elapsed);
+        } finally {
+            fclose($server);
+        }
+    }
+
+    public function testNonStringMechanismDoesNotWarnOrThrow()
+    {
+        list($client, $recorded) = $this->makeRecorderClient();
+
+        $warnings = [];
+        set_error_handler(function ($severity, $message) use (&$warnings) {
+            $warnings[] = [$severity, $message];
+            return true;
+        });
+
+        try {
+            $eventId = $client->captureException(new \RuntimeException('oops'), [
+                'mechanism' => ['not' => 'a string'],
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+        $this->assertIsString($eventId);
+        $this->assertTrue($client->flush());
+        $this->assertCount(1, $recorded);
+
+        $event = $this->decodeEnvelope($recorded[0]['body'])['payload'];
+        $this->assertSame('<unrepresentable array>', $event['exception']['values'][0]['mechanism']['type']);
+    }
+
+    public function testTruncatePreservesUtf8BoundariesWithoutReplacementChar()
+    {
+        list($client, $recorded) = $this->makeRecorderClient();
+
+        $emojiMessage = 'x' . str_repeat("\xF0\x9F\x98\x80", 1000);
+        $euroMessage = 'x' . str_repeat("\xE2\x82\xAC", 1334);
+
+        $this->assertNotNull($client->captureMessage($emojiMessage));
+        $this->assertNotNull($client->captureMessage($euroMessage));
+        $this->assertTrue($client->flush());
+        $this->assertCount(2, $recorded);
+
+        foreach ($recorded as $entry) {
+            $decoded = $this->decodeEnvelope($entry['body']);
+            $formatted = $decoded['payload']['message']['formatted'];
+            $this->assertLessThanOrEqual(Capture::MAX_MESSAGE_LENGTH, strlen($formatted));
+            $this->assertSame(1, preg_match('//u', $formatted));
+            $this->assertStringNotContainsString("\xEF\xBF\xBD", $formatted);
+            $this->assertStringNotContainsString("\xEF\xBF\xBD", $decoded['payloadRaw']);
+        }
+
+        $firstFormatted = $this->decodeEnvelope($recorded[0]['body'])['payload']['message']['formatted'];
+        $this->assertSame('x' . str_repeat("\xF0\x9F\x98\x80", 999), $firstFormatted);
     }
 }

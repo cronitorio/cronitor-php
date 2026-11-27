@@ -33,7 +33,7 @@ class Capture
             if (!($throwable instanceof \Throwable)) {
                 return null;
             }
-            $mechanism = isset($options['mechanism']) ? (string) $options['mechanism'] : 'generic';
+            $mechanism = isset($options['mechanism']) ? self::safeStr($options['mechanism']) : 'generic';
             $handled = array_key_exists('handled', $options) ? (bool) $options['handled'] : true;
 
             $event = self::baseEvent($client, $options, 'error');
@@ -123,8 +123,8 @@ class Capture
             'platform' => 'php',
             'level' => self::normalizeLevel(isset($options['level']) ? $options['level'] : null, $defaultLevel),
             'server_name' => self::hostname(),
-            'tags' => empty($eventTags) ? new \stdClass() : $eventTags,
-            'extra' => empty($extra) ? new \stdClass() : $extra,
+            'tags' => (object) $eventTags,
+            'extra' => (object) $extra,
             'sdk' => Ingest::sdkInfo(),
         ];
 
@@ -337,7 +337,40 @@ class Capture
 
     private static function truncate($value, $length)
     {
-        return strlen($value) <= $length ? $value : substr($value, 0, $length);
+        if ($length <= 0) {
+            return '';
+        }
+        if (strlen($value) <= $length) {
+            return $value;
+        }
+
+        $cut = substr($value, 0, $length);
+        $i = $length - 1;
+        $min = max(0, $length - 4);
+        while ($i >= $min && (ord($cut[$i]) & 0xC0) === 0x80) {
+            $i--;
+        }
+        if ($i < $min) {
+            return $cut;
+        }
+
+        $lead = ord($cut[$i]);
+        if (($lead & 0x80) === 0x00) {
+            $seqLen = 1;
+        } elseif (($lead & 0xE0) === 0xC0) {
+            $seqLen = 2;
+        } elseif (($lead & 0xF0) === 0xE0) {
+            $seqLen = 3;
+        } elseif (($lead & 0xF8) === 0xF0) {
+            $seqLen = 4;
+        } else {
+            return $cut;
+        }
+
+        if ($length - $i < $seqLen) {
+            return substr($cut, 0, $i);
+        }
+        return $cut;
     }
 
     private static function safeStr($value)

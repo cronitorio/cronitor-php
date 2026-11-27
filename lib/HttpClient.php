@@ -59,6 +59,8 @@ class HttpClient
 
         if (!is_null($body)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body, JSON_UNESCAPED_SLASHES));
+        } elseif (in_array(strtoupper($httpMethod), ['POST', 'PUT', 'PATCH'], true)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, '');
         }
 
         $content = curl_exec($ch);

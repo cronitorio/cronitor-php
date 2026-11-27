@@ -233,7 +233,7 @@ class Transport
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $data,
             CURLOPT_HTTPHEADER => $formattedHeaders,
-            CURLOPT_TIMEOUT => max(1, (int) ceil($timeout)),
+            CURLOPT_TIMEOUT_MS => max(1, (int) ceil($timeout * 1000)),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HEADER => false,
