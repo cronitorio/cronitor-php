@@ -30,6 +30,16 @@ class HttpClient
         return $this->request($path, 'PUT', $params, $body);
     }
 
+    public function post($path, $body = null, $params = [])
+    {
+        return $this->request($path, 'POST', $params, $body);
+    }
+
+    public function patch($path, $body = [], $params = [])
+    {
+        return $this->request($path, 'PATCH', $params, $body);
+    }
+
     private function request($path, $httpMethod, $params = [], $body = null)
     {
         $headers = $this->buildHeaders(isset($params['headers']) ? $params['headers'] : []);
