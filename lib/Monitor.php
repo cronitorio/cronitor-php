@@ -15,13 +15,15 @@ class Monitor
     public $env;
 
     private $monitorClient;
+    private $client;
 
-    public function __construct($key, $apiKey = null, $apiVersion = null, $env = null)
+    public function __construct($key, $apiKey = null, $apiVersion = null, $env = null, $client = null)
     {
         $this->apiKey = $apiKey;
         $this->apiVersion = $apiVersion;
         $this->key = $key;
         $this->env = $env;
+        $this->client = $client;
 
         $monitorApiUrl = self::BASE_MONITOR_API_URL . "/$key";
         $this->monitorClient = new HttpClient($monitorApiUrl, $this->apiKey, $this->apiVersion);
@@ -160,6 +162,32 @@ class Monitor
     public function ok()
     {
         return $this->ping(['state' => 'ok']);
+    }
+
+    public function captureException($throwable, $options = [])
+    {
+        if ($this->client === null) {
+            return null;
+        }
+        $bound = is_array($options) ? $options : [];
+        $bound['monitor'] = $this->key;
+        if (!array_key_exists('env', $bound) && $this->env !== null) {
+            $bound['env'] = $this->env;
+        }
+        return $this->client->captureException($throwable, $bound);
+    }
+
+    public function captureMessage($message, $options = [])
+    {
+        if ($this->client === null) {
+            return null;
+        }
+        $bound = is_array($options) ? $options : [];
+        $bound['monitor'] = $this->key;
+        if (!array_key_exists('env', $bound) && $this->env !== null) {
+            $bound['env'] = $this->env;
+        }
+        return $this->client->captureMessage($message, $bound);
     }
 
     private static function getMonitorHttpClient($apiKey, $apiVersion)

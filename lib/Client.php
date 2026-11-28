@@ -2,11 +2,11 @@
 
 namespace Cronitor;
 
-use Exception;
+use Throwable;
 
 class Client
 {
-    const MONITOR_TYPES = ['job', 'heartbeat', 'check'];
+    const MONITOR_TYPES = ['job', 'heartbeat', 'check', 'errors'];
     const BASE_CONFIG_KEYS = ['apiKey', 'apiVersion', 'environment'];
     const DEFAULT_CONFIG_PATH = './cronitor.yaml';
     public $config;
@@ -14,23 +14,99 @@ class Client
     public $apiVersion;
     public $monitors;
     public $environment;
+    public $dsn;
+    public $release;
+    public $captureExceptions = true;
+    public $errorApps;
+    public $errorGroups;
+
+    private $transport;
+    private $jobStack = [];
 
     public function __construct($apiKey, $apiVersion = null, $environment = null)
     {
+        $optApiVersion = $apiVersion;
+        $optEnvironment = $environment;
+        $optDsn = null;
+        $optRelease = null;
+        $optCaptureExceptions = true;
+
+        if (is_array($apiVersion)) {
+            $options = $apiVersion;
+            $optApiVersion = isset($options['apiVersion']) ? $options['apiVersion'] : null;
+            $optEnvironment = isset($options['environment']) ? $options['environment'] : $environment;
+            $optDsn = array_key_exists('dsn', $options) ? $options['dsn'] : null;
+            $optRelease = array_key_exists('release', $options) ? $options['release'] : null;
+            $optCaptureExceptions = array_key_exists('captureExceptions', $options)
+                ? (bool) $options['captureExceptions']
+                : true;
+        }
+
         $this->apiKey = $apiKey ?: getenv('CRONITOR_API_KEY');
-        $this->apiVersion = $apiVersion ?: getenv('CRONITOR_API_VERSION');
-        $this->environment = $environment ?: getenv('CRONITOR_ENVIRONMENT') ?: null;
+        $this->apiVersion = $optApiVersion ?: getenv('CRONITOR_API_VERSION');
+        $this->environment = $optEnvironment ?: getenv('CRONITOR_ENVIRONMENT') ?: null;
+        $this->dsn = $optDsn !== null ? $optDsn : (getenv('CRONITOR_DSN') ?: null);
+        $this->release = $optRelease !== null ? $optRelease : (getenv('CRONITOR_RELEASE') ?: null);
+        $this->captureExceptions = $optCaptureExceptions;
         $this->config = getenv('CRONITOR_CONFIG') ?: null;
         if ($this->config !== null) {
             $this->readConfig();
         }
 
         $this->monitors = new Monitors($this->apiKey, $this->apiVersion);
+        $this->errorApps = new ErrorApps($this->apiKey, $this->apiVersion);
+        $this->errorGroups = new ErrorGroups($this->apiKey, $this->apiVersion);
+        $this->transport = new Transport();
     }
 
     public function monitor($key)
     {
-        return new Monitor($key, $this->apiKey, $this->apiVersion, $this->environment);
+        return new Monitor($key, $this->apiKey, $this->apiVersion, $this->environment, $this);
+    }
+
+    public function errorApp($key)
+    {
+        return new ErrorApp($key, $this->apiKey, $this->apiVersion);
+    }
+
+    public function errorGroup($key)
+    {
+        return new ErrorGroup($key, $this->apiKey, $this->apiVersion);
+    }
+
+    public function captureException($throwable, $options = [])
+    {
+        return Capture::captureException($this, $throwable, is_array($options) ? $options : []);
+    }
+
+    public function captureMessage($message, $options = [])
+    {
+        return Capture::captureMessage($this, $message, is_array($options) ? $options : []);
+    }
+
+    public function flush($timeout = 2.0)
+    {
+        return $this->transport->flush($timeout);
+    }
+
+    public function getTransport()
+    {
+        return $this->transport;
+    }
+
+    public function setTransport(Transport $transport)
+    {
+        $previous = $this->transport;
+        $this->transport = $transport;
+        return $previous;
+    }
+
+    public function currentJob()
+    {
+        if (empty($this->jobStack)) {
+            return null;
+        }
+        return $this->jobStack[count($this->jobStack) - 1];
     }
 
     public function readConfig($path = null, $output = false)
@@ -115,32 +191,69 @@ class Client
     }
 
     /**
-     * @throws Exception
+     * @throws Throwable
      */
-    public function job($key, $callback)
+    public function job($key, $callback, $options = [])
     {
         $monitor = $this->monitor($key);
         $series = microtime(true);
-        $monitor->ping(['state' => 'run', 'series' => $series]);
+        $this->safePing($monitor, ['state' => 'run', 'series' => $series]);
+
+        $this->jobStack[] = [
+            'monitor' => $key,
+            'series' => $series,
+            'env' => $this->environment,
+        ];
 
         try {
             $callbackValue = $callback();
-            $monitor->ping(['state' => 'complete', 'series' => $series]);
-            return $callbackValue;
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $message = $e->getMessage();
             $truncatedMessage = substr($message, abs(min(0, 1600 - strlen($message))));
-            $monitor->ping([
+            $this->safePing($monitor, [
                 'state' => 'fail',
                 'message' => $truncatedMessage,
                 'series' => $series,
             ]);
+
+            $shouldCapture = is_array($options) && array_key_exists('captureExceptions', $options)
+                ? (bool) $options['captureExceptions']
+                : (bool) $this->captureExceptions;
+
+            if ($shouldCapture && Ingest::parseDsn($this->dsn) !== null) {
+                $this->captureException($e, [
+                    'monitor' => $key,
+                    'series' => $series,
+                    'env' => $this->environment,
+                    'mechanism' => 'cronitor.job',
+                    'handled' => false,
+                ]);
+            }
+
             throw $e;
+        } finally {
+            array_pop($this->jobStack);
+        }
+
+        $this->safePing($monitor, ['state' => 'complete', 'series' => $series]);
+        return $callbackValue;
+    }
+
+    private function safePing(Monitor $monitor, array $params)
+    {
+        try {
+            return $monitor->ping($params);
+        } catch (Throwable $e) {
+            \error_log('Cronitor Telemetry Error: ' . $e->getMessage(), 0);
+            return false;
         }
     }
 
     private static function pluralizeType($type)
     {
+        if ($type === 'errors') {
+            return 'errors';
+        }
         return $type . 's';
     }
 
@@ -148,7 +261,7 @@ class Client
     {
         return array_merge(
             self::BASE_CONFIG_KEYS,
-            array_map('self::pluralizeType', self::MONITOR_TYPES)
+            array_map([self::class, 'pluralizeType'], self::MONITOR_TYPES)
         );
     }
 }

@@ -1,0 +1,14 @@
+jobs:
+  nightly-backup:
+    schedule: "0 0 * * *"
+
+errors:
+  billing-error-spikes:
+    trigger: spike
+    apps:
+      - app_0123456789abcdef
+    threshold: 25
+    window: 5m
+    per: fingerprint
+    notify:
+      - devops-alert-pagerduty

@@ -30,6 +30,16 @@ class HttpClient
         return $this->request($path, 'PUT', $params, $body);
     }
 
+    public function post($path, $body = null, $params = [])
+    {
+        return $this->request($path, 'POST', $params, $body);
+    }
+
+    public function patch($path, $body = [], $params = [])
+    {
+        return $this->request($path, 'PATCH', $params, $body);
+    }
+
     private function request($path, $httpMethod, $params = [], $body = null)
     {
         $headers = $this->buildHeaders(isset($params['headers']) ? $params['headers'] : []);
@@ -49,6 +59,8 @@ class HttpClient
 
         if (!is_null($body)) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body, JSON_UNESCAPED_SLASHES));
+        } elseif (in_array(strtoupper($httpMethod), ['POST', 'PUT', 'PATCH'], true)) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, '');
         }
 
         $content = curl_exec($ch);
