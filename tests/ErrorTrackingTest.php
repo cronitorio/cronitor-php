@@ -714,4 +714,66 @@ PHP;
         $this->assertIsObject($secondPayload->extra);
         $this->assertIsString($secondPayload->extra->raw);
     }
+
+    private function withClearedEnv(array $names, callable $fn)
+    {
+        $saved = [];
+        foreach ($names as $name) {
+            $saved[$name] = getenv($name);
+            putenv($name);
+        }
+        try {
+            return $fn();
+        } finally {
+            foreach ($saved as $name => $value) {
+                if ($value === false) {
+                    putenv($name);
+                } else {
+                    putenv($name . '=' . $value);
+                }
+            }
+        }
+    }
+
+    public function testDsnOnlyCaptureWithoutApiKey()
+    {
+        $this->withClearedEnv(['CRONITOR_API_KEY', 'CRONITOR_DSN'], function () {
+            $recorded = new \ArrayObject();
+            $transport = new Transport(function ($url, $body, $headers, $timeout) use ($recorded) {
+                $recorded->append([
+                    'url' => $url,
+                    'body' => $body,
+                    'headers' => $headers,
+                    'timeout' => $timeout,
+                ]);
+                return ['code' => 200, 'headers' => [], 'error' => null];
+            });
+
+            $client = new Client(null, [
+                'dsn' => 'https://ing_abc123@cronitor.link/1',
+            ]);
+            $client->setTransport($transport);
+
+            $eventId = $client->captureMessage('dsn only');
+            $this->assertIsString($eventId);
+            $this->assertTrue($client->flush());
+            $this->assertCount(1, $recorded);
+            $this->assertSame('https://cronitor.link/api/1/envelope/', $recorded[0]['url']);
+
+            $decoded = $this->decodeEnvelope($recorded[0]['body']);
+            $this->assertSame('https://ing_abc123@cronitor.link/1', $decoded['envelopeHeader']['dsn']);
+            $this->assertEmpty($client->apiKey);
+        });
+    }
+
+    public function testMonitorPingWithoutApiKeyErrors()
+    {
+        $this->withClearedEnv(['CRONITOR_API_KEY', 'CRONITOR_DSN'], function () {
+            $client = new Client(null, [
+                'dsn' => 'https://ing_abc123@cronitor.link/1',
+            ]);
+            $monitor = $client->monitor('import-orders');
+            $this->assertFalse($monitor->ping(['state' => 'run']));
+        });
+    }
 }

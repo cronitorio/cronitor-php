@@ -65,11 +65,10 @@ $monitor->ping(['state' => 'complete', 'metrics' => ['count' => 1000, 'error_cou
 
 Cronitor captures exceptions and messages natively using your Error App DSN and sends them as gzipped Sentry envelopes. Failures are logged and never thrown into application code.
 
-Configure `dsn` (or the `CRONITOR_DSN` environment variable) using the DSN from an Error App created in the Cronitor dashboard or via `$cronitor->errorApps->create(...)`:
+Configure `dsn` (or the `CRONITOR_DSN` environment variable) using the DSN from an Error App created in the Cronitor dashboard or via `$cronitor->errorApps->create(...)`. An API key is not required for capture.
 
 ```php
-$cronitor = new Cronitor\Client('api_key_123', [
-    'apiVersion' => '2020-10-01',
+$cronitor = new Cronitor\Client(null, [
     'environment' => 'production',                         // or CRONITOR_ENVIRONMENT
     'dsn' => 'https://<ingest_key>@cronitor.link/1',       // or CRONITOR_DSN
     'release' => '2.4.1',                                  // or CRONITOR_RELEASE
